@@ -34,7 +34,6 @@ const Home = () => {
     useAsk<DeleteRepositoryFormData>()
   const [{ safeAsk: safeAskRenameRepository }, askRenameRepository] = useAsk()
   const { confirm } = useAlertDialogConfirm()
-  const [{ ask }, { asking, cancel, ok }] = useAsk<string, Error>()
 
   const handleDeleteRepository = async () => {
     const answer = await safeAskDeleteRepository()
@@ -60,33 +59,6 @@ const Home = () => {
         <ModeToggle />
       </header>
       <main className="grid flex-1 place-items-center px-6">
-        <Popover open={asking} onOpenChange={(open) => !open && cancel()}>
-          <PopoverPrimitive.Anchor asChild>
-            <Button
-              onClick={() =>
-                ask()
-                  .then((message) => alert(`Confirmed with message "${message}"`))
-                  .catch((error) => alert(`Cancelled with message "${error.message}"`))
-              }
-            >
-              Rename
-            </Button>
-          </PopoverPrimitive.Anchor>
-          <PopoverContent side="right">
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => cancel(new Error('No good!'))}
-              >
-                Cancel
-              </Button>
-              <Button className="w-full" onClick={() => ok('All good!')}>
-                Continue
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
         <AlertDialog
           open={askDeleteRepository.asking}
           onOpenChange={(open) => !open && askDeleteRepository.cancel()}
