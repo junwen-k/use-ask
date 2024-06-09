@@ -1,10 +1,10 @@
 'use client'
 
+import { confirm } from '@/components/confirmer'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { toast } from 'sonner'
 import { useAsk } from 'use-ask'
 
-import { useAlertDialogConfirm } from '@/components/alert-dialog-confirm-provider'
 import {
   DeleteRepositoryForm,
   DeleteRepositoryFormFields,
@@ -33,7 +33,6 @@ const Home = () => {
   const [{ safeAsk: safeAskDeleteRepository }, askDeleteRepository] =
     useAsk<DeleteRepositoryFormData>()
   const [{ safeAsk: safeAskRenameRepository }, askRenameRepository] = useAsk()
-  const { confirm } = useAlertDialogConfirm()
 
   const handleDeleteRepository = async () => {
     const answer = await safeAskDeleteRepository()
@@ -80,7 +79,6 @@ const Home = () => {
             </DeleteRepositoryForm>
           </AlertDialogContent>
         </AlertDialog>
-
         <div className="grid w-full max-w-screen-md gap-8">
           <div className="grid gap-2">
             <h2 className="text-2xl">General</h2>
