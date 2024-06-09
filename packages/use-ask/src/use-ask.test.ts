@@ -2,7 +2,7 @@ import type { RenderHookResult } from '@testing-library/react'
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { useAsk, type UseAskReturn } from './index'
+import { useAsk, type UseAskReturn } from './use-ask'
 
 // We polyfill `Promise.withResolvers` because it is not available in Node environment.
 // For more information, see https://github.com/vitest-dev/vitest/discussions/5512#discussioncomment-9054811.
