@@ -1,12 +1,12 @@
-# useAsk
+# useAsk &middot; [![License](https://img.shields.io/github/license/junwen-k/use-ask)](https://github.com/junwen-k/use-ask/blob/main/LICENSE) [![Build Status](https://img.shields.io/github/actions/workflow/status/junwen-k/use-ask/ci.yml?branch=main)](https://github.com/junwen-k/use-ask/actions) [![Total Downloads](https://img.shields.io/npm/dm/use-ask)](https://www.npmjs.com/package/use-ask)
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/junwen-k/use-ask/ci.yml?branch=main 'Build Status')](https://github.com/junwen-k/use-ask/actions)
+Create asynchronous imperative forms of "asking" with ease, including implementations like [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm) or [`prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt).
 
-[![Total Downloads](https://img.shields.io/npm/dm/use-ask 'Total Downloads')](https://www.npmjs.com/package/use-ask)
+## Features
 
-[![License](https://img.shields.io/github/license/junwen-k/use-ask 'License')](https://github.com/junwen-k/use-ask/blob/main/LICENSE)
-
-The `useAsk` hook is a headless, minimalist, and simple hook that allows users to easily build their own `confirm` and `prompt` implementations. It transforms these implementations into an async imperative form of "asking", making actions like these feel more natural to use.
+- 🛠️ Fully typesafe
+- ✅ Headless, minimalist, bring your own UI
+- 🪄 Works without a top-level context provider
 
 ## Installation
 
@@ -18,170 +18,80 @@ npm install use-ask
 
 ## Usage
 
-The `useAsk` hook is designed to help you easily build asynchronous confirmation and prompt dialogs. Its API is inspired by the native [window.confirm](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm) and [window.prompt](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt).
-
 You can start the "ask" process by calling `ask` or `safeAsk`. These functions return a promise that resolves or rejects depending on whether `ok` or `cancel` is called.
 
-Check out [examples](#examples) section for more examples using other popular UI libraries.
+Check out [examples](#examples) section for more examples using popular UI libraries.
 
 ### Global Usage
 
-A common pattern is to have a provider wrapping your entire app and exposing functions like `confirm` for imperative confirmations. Since the hook is headless, you can render anything you want, often an alert dialog.
+Create a `<Confirmer />` component using `createAsk()`.
 
-Here's an example with [Nextjs](https://nextjs.org/) and [Shadcn UI](https://ui.shadcn.com/).
+```tsx
+'use client'
 
-1. Create an `AlertDialogConfirmProvider` component.
+import { useEffect, useRef } from 'react'
+import { createAsk } from 'use-ask'
 
-   `components/alert-dialog-confirm-provider.tsx`
+// The payload for this implementation is a basic message string.
+// You can use an object as payload to render your confirm dialog.
+const [confirmStore, useConfirmStore] = createAsk<string, boolean>()
 
-   ```tsx
-   'use client'
+export const confirm = confirmStore.ask
 
-   import * as React from 'react'
-   import { useAsk } from 'use-ask'
+export const safeConfirm = confirmStore.safeAsk
 
-   import {
-     AlertDialog,
-     AlertDialogCancel,
-     AlertDialogContent,
-     AlertDialogDescription,
-     AlertDialogFooter,
-     AlertDialogHeader,
-     AlertDialogTitle,
-   } from '@/components/ui/alert-dialog'
-   import { Button } from '@/components/ui/button'
+export const Confirmer = () => {
+  const [{ key, payload: message }, { asking, cancel, ok }] = useConfirmStore()
 
-   const AlertDialogConfirmContext = React.createContext<{
-     confirm: (options: AlertDialogConfirmActionOptions) => Promise<boolean>
-     safeConfirm: (options: AlertDialogConfirmActionOptions) => Promise<boolean>
-   }>({
-     confirm: () => new Promise((resolve) => resolve(true)),
-     safeConfirm: () => new Promise((resolve) => resolve(true)),
-   })
+  const dialogRef = useRef<HTMLDialogElement>(null)
 
-   interface AlertDialogConfirmActionOptions {
-     title?: React.ReactNode
-     description?: React.ReactNode
-     cancelText?: React.ReactNode
-     actionText?: React.ReactNode
-     CancelProps?: React.ComponentProps<typeof AlertDialogCancel>
-     ActionProps?: React.ComponentProps<typeof Button>
-   }
+  useEffect(() => {
+    if (asking) {
+      dialogRef.current?.showModal()
+    } else {
+      dialogRef.current?.close()
+    }
+  }, [asking])
 
-   const defaultOptions = {
-     title: 'Are you sure?',
-     cancelText: 'Cancel',
-     actionText: 'Continue',
-   } as const satisfies AlertDialogConfirmActionOptions
+  return (
+    // We are using native <dialog> element for brevity, but you can customise the UI however you want.
+    <dialog key={key} ref={dialogRef} onCancel={cancel}>
+      <p>{message}</p>
+      <button onClick={cancel}>Cancel</button>
+      <button onClick={() => ok(true)}>OK</button>
+    </dialog>
+  )
+}
+```
 
-   export const AlertDialogConfirmProvider = ({ children }: React.PropsWithChildren) => {
-     const [{ ask: asyncConfirm, safeAsk: asyncSafeConfirm }, { asking, cancel, ok }] =
-       useAsk<boolean>()
+Add `<Confirmer />` to your app, it will be the place where your confirm dialog will be rendered. After that you can use `confirm()` from anywhere in your app.
 
-     const [options, setOptions] = React.useState<AlertDialogConfirmActionOptions>({})
-     const [key, setKey] = React.useState(0)
+```tsx
+import { Confirmer, confirm } from '@/components/confirmer'
 
-     const handleConfirm = React.useCallback(
-       (options: AlertDialogConfirmActionOptions = {}, safe?: boolean) => {
-         setKey((prevKey) => prevKey + 1)
-         setOptions({ ...defaultOptions, ...options })
+// ...
 
-         return safe ? asyncSafeConfirm().then(({ ok }) => ok) : asyncConfirm()
-       },
-       [asyncConfirm, asyncSafeConfirm]
-     )
-
-     const confirm = React.useCallback(
-       (options: AlertDialogConfirmActionOptions = {}) => handleConfirm(options),
-       [handleConfirm]
-     )
-
-     const safeConfirm = React.useCallback(
-       (options: AlertDialogConfirmActionOptions = {}) => handleConfirm(options, true),
-       [handleConfirm]
-     )
-
-     return (
-       <AlertDialogConfirmContext.Provider
-         value={{
-           confirm,
-           safeConfirm,
-         }}
-       >
-         {children}
-         <AlertDialog key={key} open={asking} onOpenChange={(open) => !open && cancel()}>
-           <AlertDialogContent>
-             <AlertDialogHeader>
-               <AlertDialogTitle>{options.title}</AlertDialogTitle>
-             </AlertDialogHeader>
-             <AlertDialogDescription>{options.description}</AlertDialogDescription>
-             <AlertDialogFooter>
-               <AlertDialogCancel {...options.CancelProps}>{options.cancelText}</AlertDialogCancel>
-               <Button {...options.ActionProps} onClick={() => ok(true)}>
-                 {options.actionText}
-               </Button>
-             </AlertDialogFooter>
-           </AlertDialogContent>
-         </AlertDialog>
-       </AlertDialogConfirmContext.Provider>
-     )
-   }
-
-   export const useAlertDialogConfirm = () => {
-     const alertDialogConfirmContext = React.useContext(AlertDialogConfirmContext)
-     if (!alertDialogConfirmContext) {
-       throw new Error('useAlertDialogConfirm should be used within <AlertDialogConfirmProvider>')
-     }
-     return alertDialogConfirmContext
-   }
-   ```
-
-1. Wrap your app with `AlertDialogConfirmProvider`.
-
-   `app/layout.tsx`
-
-   ```tsx
-   import { AlertDialogConfirmProvider } from '@/components/alert-dialog-confirm-provider'
-
-   const RootLayout = ({ children }: { children: React.ReactNode }) => {
-     return (
-       <html lang="en" suppressHydrationWarning>
-         <head />
-         <body>
-           <AlertDialogConfirmProvider>{children}</AlertDialogConfirmProvider>
-         </body>
-       </html>
-     )
-   }
-   ```
-
-1. Import `useAlertDialogConfirm` and use it.
-
-   `app/page.tsx`
-
-   ```tsx
-   import { useAlertDialogConfirm } from '@/components/alert-dialog-confirm-provider'
-
-   const Example = () => {
-     const { confirm } = useAlertDialogConfirm()
-
-     return (
-       <button
-         onClick={() =>
-           confirm()
-             .then(() => alert('Confirmed'))
-             .catch(() => alert('Cancelled'))
-         }
-       >
-         Delete
-       </button>
-     )
-   }
-   ```
+function App() {
+  return (
+    <div>
+      <Confirmer />
+      <button
+        onClick={() =>
+          confirm('Are you sure?')
+            .then(() => alert('Deleted!'))
+            .catch(() => alert('Cancelled!'))
+        }
+      >
+        Delete
+      </button>
+    </div>
+  )
+}
+```
 
 ### One-off Usage
 
-You can also create a one-off use case by using `useAsk` directly. Since the hook is headless, you can render a `Popover` as well.
+You can also create a one-off use case by using `useAsk` directly. Since the hook is headless, you can render a `<Popover>` as well.
 
 ```tsx
 const Page = () => {
@@ -226,12 +136,15 @@ This library uses [Promise.withResolvers](https://developer.mozilla.org/en-US/do
 
 ## Examples
 
-- [Shadcn UI](./examples/shadcn-ui): [Nextjs](https://nextjs.org/) app with confirmation alert dialog / popover examples built with `useAsk` hook using [Shadcn UI](https://ui.shadcn.com/).
+- [**joy-ui-vite**](./examples/joy-ui-vite): [Vite](https://vitejs.dev/) React app with confirmation dialog using [Joy UI](https://mui.com/joy-ui/getting-started/).
+- [**shadcn-ui-nextjs**](./examples/shadcn-ui-nextjs): [Nextjs](https://nextjs.org/) app with confirmation alert dialog / popover using [Shadcn UI](https://ui.shadcn.com/).
 
 ## Acknowledgements
 
 - [**material-ui-confirm**](https://github.com/jonatanklosko/material-ui-confirm) ([Jonatan Kłosko](https://github.com/jonatanklosko))
   This library provided the initial inspiration for promisifying and creating an imperative method for confirm / prompt dialogs.
+- [**sonner**](https://github.com/emilkowalski/sonner) ([Emil Kowalski](https://emilkowal.ski/))
+  Inspired the use of the observer pattern for a global store, eliminating the need for a top-level provider.
 - [**use-confirm**](https://github.com/tsivinsky/use-confirm) ([Daniil Tsivinsky](https://tsivinsky.com))
   This project influenced the naming `asking`, offering a more generic approach to implementation.
 - [**zod**](https://github.com/colinhacks/zod) ([Colin McDonnell](https://colinhacks.com/))
