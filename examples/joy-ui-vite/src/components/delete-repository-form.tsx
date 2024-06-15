@@ -42,9 +42,10 @@ export const DeleteRepositoryFormFields = () => {
   return (
     <FormField
       control={form.control}
+      rules={{ required: true }}
       name="repository"
       render={({ field }) => (
-        <FormControl>
+        <FormControl required>
           <FormLabel>To confirm, type "junwen-k/use-ask" in the box below</FormLabel>
           <Input placeholder="junwen-k/use-ask" {...field} />
           <FormMessage />

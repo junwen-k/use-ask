@@ -1,5 +1,5 @@
 import { ErrorMessage } from '@hookform/error-message'
-import { FormControl, FormLabel, FormHelperText, Typography } from '@mui/joy'
+import { FormControl as MuiFormControl, FormLabel, FormHelperText, Typography } from '@mui/joy'
 import * as React from 'react'
 import type { ControllerProps, FieldPath, FieldValues } from 'react-hook-form'
 import { Controller, FormProvider, useFormContext } from 'react-hook-form'
@@ -44,17 +44,32 @@ const useFormField = () => {
   }
 }
 
-const FormMessage = React.forwardRef(() => {
+const FormControl = React.forwardRef<
+  React.ElementRef<typeof MuiFormControl>,
+  React.ComponentPropsWithoutRef<typeof MuiFormControl>
+>(({ error, ...props }, ref) => {
+  const { invalid } = useFormField()
+
+  return <MuiFormControl ref={ref} error={invalid || error} {...props} />
+})
+FormControl.displayName = 'FormControl'
+
+const FormMessage = React.forwardRef<
+  React.ElementRef<typeof ErrorMessage>,
+  Omit<React.ComponentPropsWithoutRef<typeof ErrorMessage>, 'name' | 'render'>
+>((props, ref) => {
   const { name } = useFormField()
 
   return (
     <ErrorMessage
+      ref={ref}
       name={name}
       render={({ message }) => (
         <Typography level="body-sm" color="danger">
           {message}
         </Typography>
       )}
+      {...props}
     />
   )
 })

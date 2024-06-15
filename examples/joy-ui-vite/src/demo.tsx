@@ -77,7 +77,14 @@ export const Demo = () => {
         </ModalDialog>
       </Modal>
       <Card component={List} color="danger" size="sm" variant="outlined">
-        <ListItem sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <ListItem
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           <div>
             <Typography level="title-sm">Archive this repository</Typography>
             <Typography level="body-sm">Mark this repository as archived and read-only.</Typography>
@@ -99,7 +106,14 @@ export const Demo = () => {
           </Button>
         </ListItem>
         <Divider />
-        <ListItem sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <ListItem
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           <div>
             <Typography level="title-sm">Delete this repository</Typography>
             <Typography level="body-sm">
