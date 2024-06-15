@@ -4,20 +4,27 @@ import type { UseAskResult, UseAskReturn } from './use-ask'
  * Observable store for "ask" implementation.
  */
 export class AskStore<P, TData = unknown, TReason = unknown> {
-  store: UseAskReturn<TData, TReason>[1] & {
-    key: number
-    props: P
-  }
+  store: [
+    {
+      key: number
+      payload: P
+    },
+    UseAskReturn<TData, TReason>[1],
+  ]
   subscribers: Array<() => void>
 
-  constructor() {
-    this.store = {
-      key: 0,
-      props: {} as P,
-      asking: false,
-      cancel: () => {},
-      ok: () => {},
-    }
+  constructor(initialPayload?: P) {
+    this.store = [
+      {
+        key: 0,
+        payload: initialPayload as P,
+      },
+      {
+        asking: false,
+        cancel: () => {},
+        ok: () => {},
+      },
+    ]
     this.subscribers = []
   }
 
@@ -38,47 +45,53 @@ export class AskStore<P, TData = unknown, TReason = unknown> {
   }
 
   end = () => {
-    this.store = {
-      ...this.store,
-      asking: false,
-      cancel: () => {},
-      ok: () => {},
-    }
+    this.store = [
+      this.store[0],
+      {
+        asking: false,
+        cancel: () => {},
+        ok: () => {},
+      },
+    ]
     this.notify()
   }
 
-  start(safe: true, props: P): Promise<UseAskResult<TData, TReason>>
-  start(safe: false, props: P): Promise<TData>
-  start(safe: boolean, props: P) {
+  private start(safe: true, payload: P): Promise<UseAskResult<TData, TReason>>
+  private start(safe: false, payload: P): Promise<TData>
+  private start(safe: boolean, payload: P) {
     const { promise, resolve, reject } = Promise.withResolvers()
 
-    this.store = {
-      key: this.store.key + 1,
-      props,
-      asking: !!resolve && !!reject,
-      cancel: (reason?: TReason) => {
-        if (safe) {
-          resolve({ ok: false, reason: reason as TReason })
-        } else {
-          reject(reason)
-        }
-        this.end()
+    this.store = [
+      {
+        key: this.store[0].key + 1,
+        payload,
       },
-      ok: (data?: TData) => {
-        if (safe) {
-          resolve({ ok: true, data: data as TData })
-        } else {
-          resolve(data)
-        }
-        this.end()
+      {
+        asking: !!resolve && !!reject,
+        cancel: (reason?: TReason) => {
+          if (safe) {
+            resolve({ ok: false, reason: reason as TReason })
+          } else {
+            reject(reason)
+          }
+          this.end()
+        },
+        ok: (data?: TData) => {
+          if (safe) {
+            resolve({ ok: true, data: data as TData })
+          } else {
+            resolve(data)
+          }
+          this.end()
+        },
       },
-    }
+    ]
     this.notify()
 
     return promise
   }
 
-  ask = (props: P) => this.start(false, props)
+  ask = (payload: P) => this.start(false, payload)
 
-  safeAsk = (props: P) => this.start(true, props)
+  safeAsk = (payload: P) => this.start(true, payload)
 }

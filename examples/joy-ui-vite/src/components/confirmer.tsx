@@ -10,7 +10,7 @@ import {
 } from '@mui/joy'
 import { createAsk } from 'use-ask'
 
-const [confirmStore, useConfirmStore] = createAsk<ConfirmOptions, boolean>()
+const [confirmStore, useConfirmStore] = createAsk<ConfirmOptions, boolean>({})
 
 export const confirm = confirmStore.ask
 
@@ -40,9 +40,9 @@ const defaultOptions = {
 } as const satisfies ConfirmOptions
 
 export const Confirmer = () => {
-  const { asking, cancel, ok, key, props } = useConfirmStore()
+  const [{ key, payload }, { asking, cancel, ok }] = useConfirmStore()
 
-  const options = { ...defaultOptions, ...props }
+  const options = { ...defaultOptions, ...payload }
 
   return (
     <Modal key={key} open={asking} onClose={() => cancel()}>
