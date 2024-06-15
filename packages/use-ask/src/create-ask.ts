@@ -14,5 +14,5 @@ export const createAsk = <P, TData = unknown, TReason = unknown>(
 ): CreateAskReturn<P, TData, TReason> => {
   const store = new AskStore<P, TData, TReason>(initialPayload)
 
-  return [store, () => useSyncExternalStore(store.subscribe, store.getSnapshot)]
+  return [store, () => useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot)]
 }
