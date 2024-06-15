@@ -15,10 +15,10 @@ const compat = new FlatCompat()
 
 export default tseslint.config(
   {
-    ignores: ['node_modules/', 'packages/**/dist/'],
+    ignores: ['node_modules/', '{examples,packages}/**/dist/', 'examples/**/.next/'],
   },
   {
-    files: ['examples/shadcn-ui/**/*.{js?(x),mjs,ts?(x),mdx}'],
+    files: ['examples/shadcn-ui-nextjs/**/*.{js?(x),mjs,ts?(x),mdx}'],
     extends: [...fixupConfigRules(compat.config(nextPlugin.configs['core-web-vitals']))],
     settings: {
       next: {
@@ -52,7 +52,13 @@ export default tseslint.config(
     settings: {
       'import/resolver': {
         typescript: {
-          project: ['examples/*/tsconfig.json', 'packages/*/tsconfig.json'],
+          project: [
+            'examples/joy-ui-vite/tsconfig.json',
+            'examples/shadcn-ui-nextjs/tsconfig.json',
+            'packages/*/tsconfig.json',
+          ],
+          // FIXME: Using glob is supposed to work, but it doesn't
+          // project: ['examples/*/tsconfig.json', 'packages/*/tsconfig.json'],
         },
       },
     },
