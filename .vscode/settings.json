@@ -4,6 +4,7 @@
   },
   "eslint.workingDirectories": [{ "mode": "auto" }],
   "eslint.useFlatConfig": true,
+  "eslint.experimental.useFlatConfig": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true
 }

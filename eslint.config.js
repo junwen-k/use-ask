@@ -17,12 +17,13 @@ export default tseslint.config(
   {
     ignores: ['node_modules/', '{examples,packages}/**/dist/', 'examples/**/.next/'],
   },
+  ...fixupConfigRules(compat.config(turbo)),
   {
     files: ['examples/shadcn-ui-nextjs/**/*.{js?(x),mjs,ts?(x),mdx}'],
     extends: [...fixupConfigRules(compat.config(nextPlugin.configs['core-web-vitals']))],
     settings: {
       next: {
-        rootDir: ['apps/*/'],
+        rootDir: ['apps/shadcn-ui-nextjs/'],
       },
     },
   },
@@ -32,7 +33,6 @@ export default tseslint.config(
       eslint.configs.recommended,
       ...fixupConfigRules(compat.config(importPlugin.configs.recommended)),
       ...fixupConfigRules(compat.config(importPlugin.configs.typescript)),
-      ...fixupConfigRules(compat.config(turbo)),
     ],
     rules: {
       'import/order': [
