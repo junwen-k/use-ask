@@ -9,15 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
     "@hookform/error-message": "^2.0.1",
-    "@hookform/resolvers": "^3.6.0",
-    "@mui/icons-material": "^5.15.20",
+    "@hookform/resolvers": "^3.9.0",
+    "@mui/icons-material": "^5.16.7",
     "@mui/joy": "5.0.0-dev.240424162023-9968b4889d",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.52.0",
+    "react-hook-form": "^7.52.2",
     "use-ask": "workspace:*",
     "zod": "^3.23.8"
   },
@@ -25,6 +25,6 @@
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.3.1",
-    "vite": "^5.3.1"
+    "vite": "^5.4.1"
   }
 }
