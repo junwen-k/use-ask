@@ -1,3 +1,9 @@
 packages:
+  - 'apps/*'
   - 'examples/*'
   - 'packages/*'
+
+catalog:
+  "@ungap/with-resolvers": ^0.1.0
+  tsup: ^8.5.0
+  vitest: ^3.2.4
