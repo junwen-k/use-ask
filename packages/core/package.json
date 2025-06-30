@@ -1,0 +1,31 @@
+{
+  "name": "@use-ask/core",
+  "description": "Observable promise store for managing async state.",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "turbo watch build",
+    "build": "tsup",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@ungap/with-resolvers": "catalog:",
+    "@use-ask/typescript-config": "workspace:*",
+    "tsup": "catalog:",
+    "vitest": "catalog:"
+  }
+}
