@@ -1,27 +1,22 @@
-'use client';
-
 import { PromiseStore } from '@use-ask/core';
-import { useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
-export type CreatePromiseStoreReturn<P, TData = unknown, TReason = unknown> = [
-  PromiseStore<P, TData, TReason>,
-  ReturnType<
-    typeof useSyncExternalStore<PromiseStore<P, TData, TReason>['getSnapshot']>
-  >,
-];
-
-export const createPromiseStore = <P, TData = unknown, TReason = unknown>(
-  initialPayload?: P
-): CreatePromiseStoreReturn<P, TData, TReason> => {
-  const store = new PromiseStore<P, TData, TReason>(initialPayload);
+export const createPromiseStore = <P, TData = unknown, TReason = unknown>() => {
+  const store = new PromiseStore<P, TData, TReason>();
 
   return [
     store,
     () =>
       useSyncExternalStore(
-        store.subscribe,
-        store.getSnapshot,
-        store.getSnapshot
+        useCallback((listener) => {
+          store.addEventListener('change', listener);
+
+          return () => {
+            store.removeEventListener('change', listener);
+          };
+        }, []),
+        () => store.entries,
+        () => store.entries
       ),
-  ];
+  ] as const;
 };

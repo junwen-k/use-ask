@@ -28,11 +28,13 @@
   "devDependencies": {
     "@ungap/with-resolvers": "catalog:",
     "@testing-library/react": "^16.3.0",
+    "@types/node": "catalog:",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@use-ask/typescript-config": "workspace:*",
-    "@vitejs/plugin-react": "^4.3.1",
-    "happy-dom": "^14.12.0",
+    "@vitejs/plugin-react": "^4.6.0",
+    "@vitest/coverage-v8": "catalog:",
+    "happy-dom": "^18.0.1",
     "tsup": "catalog:",
     "vitest": "catalog:"
   },

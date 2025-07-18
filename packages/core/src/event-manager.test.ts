@@ -1,10 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import {
-  type AddEvent,
-  type ChangeEvent,
-  type DeleteEvent,
-  EventManager,
-} from './event-manager';
+import { type ChangeEvent, EventManager } from './event-manager';
 
 describe('EventManager', () => {
   it('should create a new event manager', () => {
@@ -18,16 +13,21 @@ describe('EventManager', () => {
 
     manager.addEventListener('change', listener);
 
-    const event: ChangeEvent = { type: 'change' };
-    manager.dispatch(event);
+    const event: ChangeEvent = {
+      type: 'change',
+      added: [],
+      changed: [],
+      deleted: [],
+    };
+    manager.dispatchEvent(event);
 
-    expect(listener).toHaveBeenCalledWith(event);
-    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener).toBeCalledWith(event);
+    expect(listener).toBeCalledTimes(1);
 
     manager.removeEventListener('change', listener);
 
-    manager.dispatch(event);
-    expect(listener).toHaveBeenCalledTimes(1);
+    manager.dispatchEvent(event);
+    expect(listener).toBeCalledTimes(1);
   });
 
   it('should handle multiple listeners for the same event type', () => {
@@ -38,40 +38,18 @@ describe('EventManager', () => {
     manager.addEventListener('change', listener1);
     manager.addEventListener('change', listener2);
 
-    const event: ChangeEvent = { type: 'change' };
-    manager.dispatch(event);
-
-    expect(listener1).toHaveBeenCalledWith(event);
-    expect(listener2).toHaveBeenCalledWith(event);
-    expect(listener1).toHaveBeenCalledTimes(1);
-    expect(listener2).toHaveBeenCalledTimes(1);
-  });
-
-  it('should handle different event types', () => {
-    const manager = new EventManager();
-    const changeListener = vi.fn();
-    const addListener = vi.fn();
-    const deleteListener = vi.fn();
-
-    manager.addEventListener('change', changeListener);
-    manager.addEventListener('add', addListener);
-    manager.addEventListener('delete', deleteListener);
-
-    const changeEvent: ChangeEvent = { type: 'change' };
-    const addEvent: AddEvent = { type: 'add', id: 1, payload: 'test' };
-    const deleteEvent: DeleteEvent = {
-      type: 'delete',
-      id: 1,
-      reason: 'cancelled',
+    const event: ChangeEvent = {
+      type: 'change',
+      added: [],
+      changed: [],
+      deleted: [],
     };
+    manager.dispatchEvent(event);
 
-    manager.dispatch(changeEvent);
-    manager.dispatch(addEvent);
-    manager.dispatch(deleteEvent);
-
-    expect(changeListener).toHaveBeenCalledWith(changeEvent);
-    expect(addListener).toHaveBeenCalledWith(addEvent);
-    expect(deleteListener).toHaveBeenCalledWith(deleteEvent);
+    expect(listener1).toBeCalledWith(event);
+    expect(listener2).toBeCalledWith(event);
+    expect(listener1).toBeCalledTimes(1);
+    expect(listener2).toBeCalledTimes(1);
   });
 
   it('should remove all listeners when no specific listener is provided', () => {
@@ -84,31 +62,57 @@ describe('EventManager', () => {
 
     manager.removeEventListener('change');
 
-    const event: ChangeEvent = { type: 'change' };
-    manager.dispatch(event);
+    const event: ChangeEvent = {
+      type: 'change',
+      added: [],
+      changed: [],
+      deleted: [],
+    };
+    manager.dispatchEvent(event);
 
-    expect(listener1).not.toHaveBeenCalled();
-    expect(listener2).not.toHaveBeenCalled();
+    expect(listener1).not.toBeCalled();
+    expect(listener2).not.toBeCalled();
+  });
+
+  it('should remove specific listener when provided', () => {
+    const manager = new EventManager();
+    const listener1 = vi.fn();
+    const listener2 = vi.fn();
+
+    manager.addEventListener('change', listener1);
+    manager.addEventListener('change', listener2);
+
+    manager.removeEventListener('change', listener1);
+
+    const event: ChangeEvent = {
+      type: 'change',
+      added: [],
+      changed: [],
+      deleted: [],
+    };
+    manager.dispatchEvent(event);
+
+    expect(listener1).not.toBeCalled();
+    expect(listener2).toBeCalled();
   });
 
   it('should remove all event listeners', () => {
     const manager = new EventManager();
     const changeListener = vi.fn();
-    const addListener = vi.fn();
 
     manager.addEventListener('change', changeListener);
-    manager.addEventListener('add', addListener);
 
     manager.removeAllEventListeners();
 
-    const changeEvent: ChangeEvent = { type: 'change' };
-    const addEvent: AddEvent = { type: 'add', id: 1, payload: 'test' };
+    const event: ChangeEvent = {
+      type: 'change',
+      added: [],
+      changed: [],
+      deleted: [],
+    };
+    manager.dispatchEvent(event);
 
-    manager.dispatch(changeEvent);
-    manager.dispatch(addEvent);
-
-    expect(changeListener).not.toHaveBeenCalled();
-    expect(addListener).not.toHaveBeenCalled();
+    expect(changeListener).not.toBeCalled();
   });
 
   it('should handle removing non-existent listeners gracefully', () => {
@@ -122,10 +126,15 @@ describe('EventManager', () => {
 
   it('should handle dispatching events with no listeners gracefully', () => {
     const manager = new EventManager();
-    const event: ChangeEvent = { type: 'change' };
+    const event: ChangeEvent = {
+      type: 'change',
+      added: [],
+      changed: [],
+      deleted: [],
+    };
 
     expect(() => {
-      manager.dispatch(event);
+      manager.dispatchEvent(event);
     }).not.toThrow();
   });
 });

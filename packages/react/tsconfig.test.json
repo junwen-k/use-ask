@@ -1,5 +1,5 @@
 {
-  "extends": "@use-ask/typescript-config/node.json",
+  "extends": "@use-ask/typescript-config/test.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {

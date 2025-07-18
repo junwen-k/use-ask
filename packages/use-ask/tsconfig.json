@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
-    "target": "es2019",
-    "lib": ["ES2019", "ESNext.Promise"],
+    "target": "ES2020",
+    "lib": ["ES2024"],
     "module": "ESNext",
     "declaration": true,
     "declarationMap": false,
     "declarationDir": "dist",
     "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "stripInternal": true,
     "outDir": "dist",
     "allowJs": true

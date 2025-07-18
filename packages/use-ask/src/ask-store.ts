@@ -1,17 +1,17 @@
-import type { UseAskResult, UseAskReturn } from './use-ask'
+import type { UseAskResult, UseAskReturn } from './use-ask';
 
 /**
  * Observable store for "ask" implementation.
  */
 export class AskStore<P, TData = unknown, TReason = unknown> {
-  store: [
+  private store: [
     {
-      key: number
-      payload: P
+      key: number;
+      payload: P;
     },
     UseAskReturn<TData, TReason>[1],
-  ]
-  subscribers: Array<() => void>
+  ];
+  private subscribers: Set<() => void>;
 
   constructor(initialPayload?: P) {
     this.store = [
@@ -21,45 +21,54 @@ export class AskStore<P, TData = unknown, TReason = unknown> {
       },
       {
         asking: false,
-        cancel: () => {},
-        ok: () => {},
+        cancel: () => {
+          // noop
+        },
+        ok: () => {
+          // noop
+        },
       },
-    ]
-    this.subscribers = []
+    ];
+    this.subscribers = new Set();
   }
 
-  getSnapshot = () => this.store
+  getSnapshot = () => this.store;
 
   // We use arrow functions to maintain the correct `this` reference
   subscribe = (subscriber: () => void) => {
-    this.subscribers.push(subscriber)
+    this.subscribers.add(subscriber);
 
     return () => {
-      const index = this.subscribers.indexOf(subscriber)
-      this.subscribers.splice(index, 1)
-    }
-  }
+      this.subscribers.delete(subscriber);
+    };
+  };
 
   notify = () => {
-    this.subscribers.forEach((subscriber) => subscriber())
-  }
+    for (const subscriber of this.subscribers) {
+      subscriber();
+    }
+  };
 
   end = () => {
     this.store = [
       this.store[0],
       {
         asking: false,
-        cancel: () => {},
-        ok: () => {},
+        cancel: () => {
+          // noop
+        },
+        ok: () => {
+          // noop
+        },
       },
-    ]
-    this.notify()
-  }
+    ];
+    this.notify();
+  };
 
-  private start(safe: true, payload: P): Promise<UseAskResult<TData, TReason>>
-  private start(safe: false, payload: P): Promise<TData>
+  private start(safe: true, payload: P): Promise<UseAskResult<TData, TReason>>;
+  private start(safe: false, payload: P): Promise<TData>;
   private start(safe: boolean, payload: P) {
-    const { promise, resolve, reject } = Promise.withResolvers()
+    const { promise, resolve, reject } = Promise.withResolvers();
 
     this.store = [
       {
@@ -70,28 +79,28 @@ export class AskStore<P, TData = unknown, TReason = unknown> {
         asking: !!resolve && !!reject,
         cancel: (reason?: TReason) => {
           if (safe) {
-            resolve({ ok: false, reason: reason as TReason })
+            resolve({ ok: false, reason: reason as TReason });
           } else {
-            reject(reason)
+            reject(reason);
           }
-          this.end()
+          this.end();
         },
         ok: (data?: TData) => {
           if (safe) {
-            resolve({ ok: true, data: data as TData })
+            resolve({ ok: true, data: data as TData });
           } else {
-            resolve(data)
+            resolve(data);
           }
-          this.end()
+          this.end();
         },
       },
-    ]
-    this.notify()
+    ];
+    this.notify();
 
-    return promise
+    return promise;
   }
 
-  ask = (payload: P) => this.start(false, payload)
+  ask = (payload: P) => this.start(false, payload);
 
-  safeAsk = (payload: P) => this.start(true, payload)
+  safeAsk = (payload: P) => this.start(true, payload);
 }

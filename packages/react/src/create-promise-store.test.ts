@@ -1,40 +1,98 @@
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { PromiseStore } from '@use-ask/core';
-import { describe, expect, it } from 'vitest';
-
+import { describe, expect, it, vi } from 'vitest';
 import { createPromiseStore } from './create-promise-store';
 
-// TODO: test strict typing
+// We polyfill `Promise.withResolvers` because it is not available in Node environment.
+import '@ungap/with-resolvers';
 
 describe('createPromiseStore', () => {
-  it('should create store with initial payload', () => {
-    const initialPayload = { test: 'data' };
-    const { result } = renderHook(() => {
-      const [store, snapshot] = createPromiseStore(initialPayload);
-      return { store, snapshot };
-    });
+  describe('Initialization', () => {
+    it('should create a new store and use snapshot hook', () => {
+      const [store, useEntries] = createPromiseStore();
 
-    expect(result.current.store).toBeDefined();
-    expect(result.current.store.getSnapshot()[0].payload).toBe(initialPayload);
+      expect(store).toBeInstanceOf(PromiseStore);
+      expect(useEntries).toBeInstanceOf(Function);
+    });
   });
 
-  it('should create store without initial payload', () => {
-    const { result } = renderHook(() => {
-      const [store, snapshot] = createPromiseStore();
-      return { store, snapshot };
+  describe('Store Operations', () => {
+    it('should reflect store changes in entries', () => {
+      const [store, useEntries] = createPromiseStore();
+
+      const { result } = renderHook(() => useEntries());
+
+      act(() => {
+        store.add('test');
+      });
+
+      expect(result.current).toHaveLength(1);
+      expect(result.current[0].payload).toBe('test');
     });
 
-    expect(result.current.store).toBeDefined();
-    expect(result.current.store.getSnapshot()[0].payload).toBeUndefined();
-  });
+    it('should handle promises', async () => {
+      const [store, useEntries] = createPromiseStore();
 
-  it('should return store and snapshot function', () => {
-    const { result } = renderHook(() => {
-      const [store, getSnapshot] = createPromiseStore();
-      return { store, getSnapshot };
+      const { result } = renderHook(() => useEntries());
+
+      act(() => {
+        const entry = store.add('test');
+
+        store.get(entry.id)?.resolve('success');
+      });
+
+      await expect(result.current[0].promise).resolves.toBe('success');
     });
 
-    expect(result.current.store).toBeInstanceOf(PromiseStore);
-    expect(result.current.getSnapshot).toBeInstanceOf(Function);
+    it('should handle safe promises', async () => {
+      const [store, useEntries] = createPromiseStore();
+
+      const { result } = renderHook(() => useEntries());
+
+      act(() => {
+        const entry = store.addSafe('test');
+
+        store.get(entry.id)?.resolve('success');
+      });
+
+      await expect(result.current[0].promise).resolves.toEqual({
+        ok: true,
+        data: 'success',
+      });
+    });
+
+    it('should update entries when store is cleared', () => {
+      const [store, useEntries] = createPromiseStore();
+
+      const { result } = renderHook(() => useEntries());
+
+      act(() => {
+        store.add('test1');
+        store.add('test2');
+      });
+
+      expect(result.current).toHaveLength(2);
+
+      act(() => {
+        store.clear();
+      });
+
+      expect(result.current).toHaveLength(0);
+    });
+
+    it('should cleanup event listeners when hook unmounts', () => {
+      const [store, useEntries] = createPromiseStore();
+      const { unmount } = renderHook(() => useEntries());
+
+      const removeEventListenerSpy = vi.spyOn(store, 'removeEventListener');
+
+      unmount();
+
+      expect(removeEventListenerSpy).toHaveBeenCalledWith(
+        'change',
+        expect.any(Function)
+      );
+      removeEventListenerSpy.mockRestore();
+    });
   });
 });

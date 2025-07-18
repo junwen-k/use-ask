@@ -1,119 +1,285 @@
-type UseAskResult<TData = unknown, TReason = unknown> =
-  | {
-      ok: true;
-      data: TData;
-    }
-  | {
-      ok: false;
-      reason: TReason;
-    };
+import { type ChangeEvent, EventManager } from './event-manager';
 
-type UseAskReturn<TData = unknown, TReason = unknown> = [
-  {
-    ask: () => Promise<TData>;
-    safeAsk: () => Promise<UseAskResult<TData, TReason>>;
-  },
-  {
-    pending: boolean;
-    cancel: (reason?: TReason) => void;
-    ok: (data?: TData) => void;
-  },
-];
+export type Id = number;
 
-export class PromiseStore<P, TData = unknown, TReason = unknown> {
-  private store: [
-    {
-      key: number;
-      payload: P;
-    },
-    UseAskReturn<TData, TReason>[1],
-  ];
-  private subscribers: Set<() => void>;
+export type SafeResult<TData = unknown, TReason = unknown> =
+  | SafeFullfilledResult<TData>
+  | SafeRejectedResult<TReason>;
 
-  constructor(initialPayload?: P) {
-    this.store = [
-      {
-        key: 0,
-        payload: initialPayload as P,
-      },
-      {
-        pending: false,
-        cancel: () => {},
-        ok: () => {},
-      },
-    ];
-    this.subscribers = new Set();
+export interface SafeFullfilledResult<TData = unknown> {
+  ok: true;
+  data: TData;
+}
+
+export interface SafeRejectedResult<TReason = unknown> {
+  ok: false;
+  reason: TReason;
+}
+
+export type PromiseEntry<
+  TPayload = unknown,
+  TData = unknown,
+  TReason = unknown,
+> =
+  | PromiseEntryUnsafe<TPayload, TData, TReason>
+  | PromiseEntrySafe<TPayload, TData, TReason>;
+
+export interface PromiseEntryBase<
+  TPayload = unknown,
+  TData = unknown,
+  TReason = unknown,
+> {
+  id: Id;
+  payload: TPayload;
+  resolve: (data?: TData) => void;
+  reject: (reason?: TReason) => void;
+}
+
+export interface PromiseEntryUnsafe<
+  TPayload = unknown,
+  TData = unknown,
+  TReason = unknown,
+> extends PromiseEntryBase<TPayload, TData, TReason> {
+  promise: Promise<TData>;
+  safe: false;
+}
+
+export interface PromiseEntrySafe<
+  TPayload = unknown,
+  TData = unknown,
+  TReason = unknown,
+> extends PromiseEntryBase<TPayload, TData, TReason> {
+  promise: Promise<SafeResult<TData, TReason>>;
+  safe: true;
+}
+
+export class PromiseStore<
+  TPayload = unknown,
+  TData = unknown,
+  TReason = unknown,
+> {
+  #stack: Map<Id, PromiseEntry<TPayload, TData, TReason>> = new Map();
+  #snapshot: PromiseEntry<TPayload, TData, TReason>[] | null = null;
+
+  #eventManager: EventManager<TPayload, TData, TReason> = new EventManager<
+    TPayload,
+    TData,
+    TReason
+  >();
+  #changeVersion = 0;
+
+  #nextId = 0;
+
+  get entries() {
+    return this.memoizeSnapshot(() => Array.from(this.#stack.values()));
   }
 
-  getSnapshot = () => this.store;
+  memoizeSnapshot<T extends PromiseEntry<TPayload, TData, TReason>[]>(
+    snapshotFn: () => T
+  ) {
+    const currentVersion = this.#getChangeVersion();
 
-  // We use arrow functions to maintain the correct `this` reference
-  subscribe = (subscriber: () => void) => {
-    this.subscribers.add(subscriber);
-
-    return () => {
-      this.subscribers.delete(subscriber);
-    };
-  };
-
-  notify = () => {
-    for (const subscriber of this.subscribers) {
-      subscriber();
+    if (this.#snapshot && this.#changeVersion === currentVersion) {
+      return this.#snapshot;
     }
-  };
 
-  end = () => {
-    this.store = [
-      this.store[0],
-      {
-        pending: false,
-        cancel: () => {
-          // noop
-        },
-        ok: () => {
-          // noop
-        },
-      },
-    ];
-    this.notify();
-  };
+    const result = snapshotFn();
 
-  private start(safe: true, payload: P): Promise<UseAskResult<TData, TReason>>;
-  private start(safe: false, payload: P): Promise<TData>;
-  private start(safe: boolean, payload: P) {
-    const { promise, resolve, reject } = Promise.withResolvers();
+    this.#snapshot = result;
 
-    this.store = [
-      {
-        key: this.store[0].key + 1,
-        payload,
-      },
-      {
-        pending: !!resolve && !!reject,
-        cancel: (reason?: TReason) => {
-          if (safe) {
-            resolve({ ok: false, reason: reason as TReason });
-          } else {
-            reject(reason);
-          }
-          this.end();
-        },
-        ok: (data?: TData) => {
-          if (safe) {
-            resolve({ ok: true, data: data as TData });
-          } else {
-            resolve(data);
-          }
-          this.end();
-        },
-      },
-    ];
-    this.notify();
-
-    return promise;
+    return result;
   }
 
-  create = (payload: P) => this.start(false, payload);
+  #getChangeVersion() {
+    return this.#changeVersion;
+  }
 
-  safeCreate = (payload: P) => this.start(true, payload);
+  #generateId() {
+    const id = this.#nextId;
+    this.#nextId++;
+    return id;
+  }
+
+  #invalidateSnapshot() {
+    this.#snapshot = null;
+    this.#changeVersion++;
+  }
+
+  #dispatchChangeEvent({
+    added,
+    changed,
+    deleted,
+  }: Omit<ChangeEvent<TPayload, TData, TReason>, 'type'>) {
+    this.#invalidateSnapshot();
+    this.#eventManager.dispatchEvent({
+      type: 'change',
+      added,
+      changed,
+      deleted,
+    });
+  }
+
+  #addPromise(
+    payload: TPayload,
+    safe: false
+  ): PromiseEntryUnsafe<TPayload, TData, TReason>;
+  #addPromise(
+    payload: TPayload,
+    safe: true
+  ): PromiseEntrySafe<TPayload, TData, TReason>;
+  #addPromise(payload: TPayload, safe: boolean) {
+    const {
+      promise,
+      resolve: resolvePromise,
+      reject: rejectPromise,
+    } = Promise.withResolvers();
+
+    const resolve = (data?: TData) => {
+      if (safe) {
+        resolvePromise({ ok: true, data });
+      } else {
+        resolvePromise(data);
+      }
+    };
+
+    const reject = (reason?: TReason) => {
+      if (safe) {
+        resolvePromise({ ok: false, reason });
+      } else {
+        rejectPromise(reason);
+      }
+    };
+
+    const id = this.#generateId();
+
+    const entry = {
+      id,
+      payload,
+      promise,
+      resolve,
+      reject,
+      pending: Boolean(resolvePromise) && Boolean(rejectPromise),
+      safe,
+    } as PromiseEntry<TPayload, TData, TReason>;
+
+    this.#stack.set(entry.id, entry);
+
+    this.#dispatchChangeEvent({
+      added: [entry],
+      changed: [],
+      deleted: [],
+    });
+
+    return entry;
+  }
+
+  /**
+   * Adds a pending promise entry to the store, returning the promise directly.
+   */
+  add(payload: TPayload) {
+    return this.#addPromise(payload, false);
+  }
+
+  /**
+   * Adds a safe pending promise entry to the store, returning the promise directly.
+   */
+  addSafe(payload: TPayload) {
+    return this.#addPromise(payload, true);
+  }
+
+  /**
+   * Gets a promise entry from the store.
+   */
+  get(id: Id) {
+    return this.#stack.get(id);
+  }
+
+  /**
+   * Gets all promise entries from the store.
+   */
+  getAll() {
+    return this.entries;
+  }
+
+  /**
+   * Updates a promise entry in the store.
+   */
+  update(id: Id, payload: TPayload) {
+    const entry = this.#stack.get(id);
+    if (!entry) {
+      return;
+    }
+
+    const newEntry = {
+      ...entry,
+      payload,
+    } as PromiseEntry<TPayload, TData, TReason>;
+
+    this.#stack.set(id, newEntry);
+
+    this.#dispatchChangeEvent({
+      added: [],
+      changed: [newEntry],
+      deleted: [],
+    });
+
+    return entry;
+  }
+
+  /**
+   * Deletes a promise entry from the store.
+   */
+  delete(id: Id) {
+    const entry = this.#stack.get(id);
+    if (!entry) {
+      return;
+    }
+
+    this.#stack.delete(id);
+
+    this.#dispatchChangeEvent({
+      added: [],
+      changed: [],
+      deleted: [entry],
+    });
+
+    return entry;
+  }
+
+  /**
+   * Clears all promise stack from the store.
+   */
+  clear() {
+    const deleted = Array.from(this.#stack.values());
+
+    this.#stack.clear();
+
+    this.#dispatchChangeEvent({
+      added: [],
+      changed: [],
+      deleted,
+    });
+  }
+
+  /**
+   * Adds an event listener to the store.
+   */
+  addEventListener(
+    ...args: Parameters<
+      EventManager<TPayload, TData, TReason>['addEventListener']
+    >
+  ) {
+    this.#eventManager.addEventListener(...args);
+  }
+
+  /**
+   * Removes an event listener from the store.
+   */
+  removeEventListener(
+    ...args: Parameters<
+      EventManager<TPayload, TData, TReason>['removeEventListener']
+    >
+  ) {
+    this.#eventManager.removeEventListener(...args);
+  }
 }

@@ -22,18 +22,19 @@
     "dist"
   ],
   "scripts": {
-    "dev": "tsup --watch",
+    "dev": "turbo watch build",
     "build": "tsup",
     "lint": "eslint .",
     "test": "vitest"
   },
   "devDependencies": {
+    "@ungap/with-resolvers": "catalog:",
     "@testing-library/react": "^16.0.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
-    "happy-dom": "^14.12.0",
-    "tsup": "^8.0.2",
+    "happy-dom": "^18.0.1",
+    "tsup": "catalog:",
     "vitest": "^1.6.0"
   },
   "peerDependencies": {

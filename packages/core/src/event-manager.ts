@@ -1,22 +1,16 @@
+import type { PromiseEntry } from './promise-store';
+
 /**
  * Represents the different types of events that can be dispatched.
  */
-export type EventType = 'change' | 'add' | 'delete' | 'update' | 'clear';
+export type EventType = 'change';
 
 /**
  * Maps an event type string to its respective event interface.
  */
-type EventByType<T> = T extends 'change'
-  ? ChangeEvent
-  : T extends 'add'
-    ? AddEvent
-    : T extends 'delete'
-      ? DeleteEvent
-      : T extends 'update'
-        ? UpdateEvent
-        : T extends 'clear'
-          ? ClearEvent
-          : never;
+type EventByType<T, TPayload, TData, TReason> = T extends 'change'
+  ? ChangeEvent<TPayload, TData, TReason>
+  : never;
 
 /**
  * Base interface for all events.
@@ -28,74 +22,51 @@ export interface BaseEvent {
 /**
  * Event fired when a change occurs in the store.
  */
-export interface ChangeEvent extends BaseEvent {
+export interface ChangeEvent<
+  TPayload = unknown,
+  TData = unknown,
+  TReason = unknown,
+> extends BaseEvent {
   type: 'change';
-}
-
-/**
- * Event fired when a new promise is added to the store.
- */
-export interface AddEvent extends BaseEvent {
-  type: 'add';
-  id: number;
-  payload: unknown;
-}
-
-/**
- * Event fired when a promise is deleted from the store.
- */
-export interface DeleteEvent extends BaseEvent {
-  type: 'delete';
-  id: number;
-  reason?: unknown;
-}
-
-/**
- * Event fired when a promise payload is updated.
- */
-export interface UpdateEvent extends BaseEvent {
-  type: 'update';
-  id: number;
-  payload: unknown;
-}
-
-/**
- * Event fired when all promises are cleared from the store.
- */
-export interface ClearEvent extends BaseEvent {
-  type: 'clear';
-  reason?: unknown;
+  added: PromiseEntry<TPayload, TData, TReason>[];
+  changed: PromiseEntry<TPayload, TData, TReason>[];
+  deleted: PromiseEntry<TPayload, TData, TReason>[];
 }
 
 /**
  * Type representing all possible event types.
  */
-export type Event =
-  | ChangeEvent
-  | AddEvent
-  | DeleteEvent
-  | UpdateEvent
-  | ClearEvent;
+export type Event<
+  TPayload = unknown,
+  TData = unknown,
+  TReason = unknown,
+> = ChangeEvent<TPayload, TData, TReason>;
 
-export type EventListener<T extends EventType> = (
-  event: EventByType<T>
+export type EventListener<T extends EventType, TPayload, TData, TReason> = (
+  event: EventByType<T, TPayload, TData, TReason>
 ) => void;
 
 /**
  * Manages registration and dispatching of event listeners.
  */
-export class EventManager {
-  readonly #eventListeners: Map<EventType, Set<EventListener<EventType>>> =
-    new Map();
+export class EventManager<
+  TPayload = unknown,
+  TData = unknown,
+  TReason = unknown,
+> {
+  readonly #eventListeners: Map<
+    EventType,
+    Set<EventListener<EventType, TPayload, TData, TReason>>
+  > = new Map();
 
   addEventListener<T extends EventType>(
     type: T,
-    listener: EventListener<T>
-  ): void {
+    listener: EventListener<T, TPayload, TData, TReason>
+  ) {
     let listeners = this.#eventListeners.get(type);
 
     if (!listeners) {
-      listeners = new Set<EventListener<T>>();
+      listeners = new Set<EventListener<T, TPayload, TData, TReason>>();
       this.#eventListeners.set(type, listeners);
     }
 
@@ -104,8 +75,8 @@ export class EventManager {
 
   removeEventListener<T extends EventType>(
     type: T,
-    listener?: EventListener<T>
-  ): void {
+    listener?: EventListener<T, TPayload, TData, TReason>
+  ) {
     const listeners = this.#eventListeners.get(type);
     if (!listeners) {
       return;
@@ -122,7 +93,9 @@ export class EventManager {
     }
   }
 
-  dispatch<T extends EventType>(event: EventByType<T>): void {
+  dispatchEvent<T extends EventType>(
+    event: EventByType<T, TPayload, TData, TReason>
+  ) {
     const listeners = this.#eventListeners.get(event.type);
     if (!listeners) {
       return;
@@ -133,7 +106,7 @@ export class EventManager {
     }
   }
 
-  removeAllEventListeners(): void {
+  removeAllEventListeners() {
     this.#eventListeners.clear();
   }
 }
