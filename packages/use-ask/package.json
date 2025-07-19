@@ -25,7 +25,7 @@
     "dev": "turbo watch build",
     "build": "tsup",
     "lint": "eslint .",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "devDependencies": {
     "@ungap/with-resolvers": "catalog:",

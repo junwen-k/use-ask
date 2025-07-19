@@ -20,7 +20,7 @@
   "scripts": {
     "dev": "turbo watch build",
     "build": "tsup",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "devDependencies": {
     "@types/node": "catalog:",
