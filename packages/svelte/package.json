@@ -1,0 +1,45 @@
+{
+  "name": "@use-ask/svelte",
+  "description": "Svelte package for use-ask",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "turbo watch build",
+    "build": "tsup",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@use-ask/core": "workspace:*"
+  },
+  "devDependencies": {
+    "svelte": "^5.36.8",
+    "svelte-check": "^4.2.2",
+    "@sveltejs/vite-plugin-svelte": "^6.1.0",
+    "@types/node": "catalog:",
+    "@ungap/with-resolvers": "catalog:",
+    "@use-ask/typescript-config": "workspace:*",
+    "@vitest/browser": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "playwright": "^1.53.0",
+    "tsup": "catalog:",
+    "vitest": "catalog:",
+    "vitest-browser-svelte": "^0.1.0"
+  },
+  "peerDependencies": {
+    "svelte": "^5.7.0"
+  }
+}
