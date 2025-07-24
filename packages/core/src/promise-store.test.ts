@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { PromiseStore } from './promise-store';
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { PromiseStore } from "./promise-store";
 
 // We polyfill `Promise.withResolvers` because it is not available in Node environment.
-import '@ungap/with-resolvers';
+import "@ungap/with-resolvers";
 
 let store: PromiseStore;
 
@@ -10,20 +10,20 @@ beforeEach(() => {
   store = new PromiseStore();
 });
 
-describe('PromiseStore', () => {
-  describe('Initialization', () => {
-    it('should create a new store', () => {
+describe("PromiseStore", () => {
+  describe("Initialization", () => {
+    it("should create a new store", () => {
       expect(store).toBeInstanceOf(PromiseStore);
     });
   });
 
-  describe('Create', () => {
-    it('should be able to add a promise entry and resolve it', async () => {
-      const entry = store.add('payload');
+  describe("Create", () => {
+    it("should be able to add a promise entry and resolve it", async () => {
+      const entry = store.add("payload");
 
       expect(entry).toBeDefined();
       expect(entry.id).toBeDefined();
-      expect(entry.payload).toBe('payload');
+      expect(entry.payload).toBe("payload");
       expect(entry.safe).toBe(false);
       expect(entry.promise).toBeInstanceOf(Promise);
       expect(entry.resolve).toBeDefined();
@@ -32,17 +32,17 @@ describe('PromiseStore', () => {
       expect(store.entries).toHaveLength(1);
       expect(store.entries[0]).toBe(entry);
 
-      entry.resolve('value');
+      entry.resolve("value");
 
-      await expect(entry.promise).resolves.toBe('value');
+      await expect(entry.promise).resolves.toBe("value");
     });
 
-    it('should be able to add a safe promise entry and resolve it', async () => {
-      const entry = store.addSafe('payload');
+    it("should be able to add a safe promise entry and resolve it", async () => {
+      const entry = store.addSafe("payload");
 
       expect(entry).toBeDefined();
       expect(entry.id).toBeDefined();
-      expect(entry.payload).toBe('payload');
+      expect(entry.payload).toBe("payload");
       expect(entry.safe).toBe(true);
       expect(entry.promise).toBeInstanceOf(Promise);
       expect(entry.resolve).toBeDefined();
@@ -51,95 +51,95 @@ describe('PromiseStore', () => {
       expect(store.entries).toHaveLength(1);
       expect(store.entries[0]).toBe(entry);
 
-      entry.resolve('value');
+      entry.resolve("value");
 
-      await expect(entry.promise).resolves.toEqual({ ok: true, data: 'value' });
+      await expect(entry.promise).resolves.toEqual({ ok: true, data: "value" });
     });
 
-    it('should be able to add a promise entry and reject it', async () => {
-      const entry = store.add('payload');
+    it("should be able to add a promise entry and reject it", async () => {
+      const entry = store.add("payload");
 
-      entry.reject('reason');
+      entry.reject("reason");
 
-      await expect(entry.promise).rejects.toThrow('reason');
+      await expect(entry.promise).rejects.toThrow("reason");
     });
 
-    it('should be able to add a safe promise entry and reject without throwing', async () => {
-      const entry = store.addSafe('payload');
+    it("should be able to add a safe promise entry and reject without throwing", async () => {
+      const entry = store.addSafe("payload");
 
-      entry.reject('reason');
+      entry.reject("reason");
 
       await expect(entry.promise).resolves.toEqual({
         ok: false,
-        reason: 'reason',
+        reason: "reason",
       });
     });
 
-    it('should be able to reject with an error', async () => {
-      const entry = store.add('payload');
+    it("should be able to reject with an error", async () => {
+      const entry = store.add("payload");
 
-      entry.reject(new Error('reason'));
+      entry.reject(new Error("reason"));
 
-      await expect(entry.promise).rejects.toThrow('reason');
+      await expect(entry.promise).rejects.toThrow("reason");
     });
 
-    it('should maintain the correct order of promise resolution', async () => {
-      const entry1 = store.add('payload1');
-      const entry2 = store.add('payload2');
+    it("should maintain the correct order of promise resolution", async () => {
+      const entry1 = store.add("payload1");
+      const entry2 = store.add("payload2");
 
-      entry2.resolve('value2');
-      entry1.resolve('value1');
+      entry2.resolve("value2");
+      entry1.resolve("value1");
 
-      await expect(entry2.promise).resolves.toBe('value2');
-      await expect(entry1.promise).resolves.toBe('value1');
+      await expect(entry2.promise).resolves.toBe("value2");
+      await expect(entry1.promise).resolves.toBe("value1");
     });
   });
 
-  describe('Read', () => {
-    it('should be able to retrieve a promise entry by id', () => {
-      const entry = store.add('payload');
+  describe("Read", () => {
+    it("should be able to retrieve a promise entry by id", () => {
+      const entry = store.add("payload");
 
       expect(store.get(entry.id)).toBe(entry);
     });
 
-    it('should return undefined if the promise entry is not found by id', () => {
+    it("should return undefined if the promise entry is not found by id", () => {
       expect(store.get(0)).toBeUndefined();
     });
 
-    it('should be able to retrieve all promise entries', () => {
-      const entry1 = store.add('payload1');
-      const entry2 = store.add('payload2');
+    it("should be able to retrieve all promise entries", () => {
+      const entry1 = store.add("payload1");
+      const entry2 = store.add("payload2");
 
       expect(store.getAll()).toEqual([entry1, entry2]);
     });
 
-    it('should return an empty array if there are no promise entries', () => {
+    it("should return an empty array if there are no promise entries", () => {
       expect(store.getAll()).toEqual([]);
     });
   });
 
-  describe('Update', () => {
-    it('should be able to update a promise entry', () => {
-      const entry = store.add('payload');
+  describe("Update", () => {
+    it("should be able to update a promise entry", () => {
+      const entry = store.add("payload");
 
-      store.update(entry.id, 'updated');
+      store.update(entry.id, "updated");
 
       const updatedEntry = store.get(entry.id);
 
       expect(updatedEntry).toBeDefined();
-      expect(updatedEntry?.payload).toBe('updated');
+      expect(updatedEntry?.payload).toBe("updated");
     });
 
-    it('should handle updating a non-existent promise entry gracefully', () => {
-      store.update(0, 'updated');
+    it("should handle updating a non-existent promise entry gracefully", () => {
+      store.update(0, "updated");
 
-      expect(() => store.update(0, 'updated')).not.toThrow();
+      expect(() => store.update(0, "updated")).not.toThrow();
     });
   });
 
-  describe('Delete', () => {
-    it('should be able to delete a promise entry by id', () => {
-      const entry = store.add('payload');
+  describe("Delete", () => {
+    it("should be able to delete a promise entry by id", () => {
+      const entry = store.add("payload");
 
       store.delete(entry.id);
 
@@ -147,13 +147,13 @@ describe('PromiseStore', () => {
       expect(store.get(entry.id)).toBeUndefined();
     });
 
-    it('should handle deleting a non-existent promise entry gracefully', () => {
+    it("should handle deleting a non-existent promise entry gracefully", () => {
       expect(() => store.delete(0)).not.toThrow();
     });
 
-    it('should clear all promise entries', () => {
-      const entry1 = store.add('payload');
-      const entry2 = store.add('payload');
+    it("should clear all promise entries", () => {
+      const entry1 = store.add("payload");
+      const entry2 = store.add("payload");
 
       expect(store.entries).toHaveLength(2);
       expect(store.get(entry1.id)).toBeDefined();
@@ -167,120 +167,132 @@ describe('PromiseStore', () => {
     });
   });
 
-  describe('Event', () => {
-    it('should dispatch change events when adding a promise entry', () => {
-      const changeListener = vi.fn();
+  describe("Event", () => {
+    it("should dispatch add events when adding a promise entry", () => {
+      const addListener = vi.fn();
 
-      store.addEventListener('change', changeListener);
+      store.addEventListener("add", addListener);
 
-      store.add('payload');
+      const entry = store.add("payload");
 
-      expect(changeListener).toBeCalledTimes(1);
-      expect(changeListener).toBeCalledWith({
-        type: 'change',
-        added: expect.arrayContaining([
-          expect.objectContaining({
-            payload: 'payload',
-            safe: false,
-          }),
-        ]),
-        changed: [],
-        deleted: [],
+      expect(addListener).toBeCalledTimes(1);
+      expect(addListener).toBeCalledWith({
+        type: "add",
+        entry,
       });
-
-      const event = changeListener.mock.calls[0][0];
-      expect(event.added[0].payload).toBe('payload');
     });
 
-    it('should dispatch change events when updating a promise entry', () => {
-      const changeListener = vi.fn();
+    it("should dispatch update events when updating a promise entry", () => {
+      const updateListener = vi.fn();
 
-      store.addEventListener('change', changeListener);
+      store.addEventListener("update", updateListener);
 
-      const entry = store.add('payload');
-      store.update(entry.id, 'updated');
+      const entry = store.add("payload");
+      store.update(entry.id, "updated");
 
-      expect(changeListener).toBeCalledTimes(2);
-
-      expect(changeListener).nthCalledWith(1, {
-        type: 'change',
-        added: expect.arrayContaining([
-          expect.objectContaining({
-            payload: 'payload',
-          }),
-        ]),
-        changed: [],
-        deleted: [],
+      expect(updateListener).toBeCalledTimes(1);
+      expect(updateListener).toBeCalledWith({
+        type: "update",
+        entry: expect.objectContaining({
+          id: entry.id,
+          payload: "updated",
+        }),
       });
-
-      expect(changeListener).nthCalledWith(2, {
-        type: 'change',
-        added: [],
-        changed: expect.arrayContaining([
-          expect.objectContaining({
-            payload: 'updated',
-          }),
-        ]),
-        deleted: [],
-      });
-
-      const addedEvent = changeListener.mock.calls[0][0];
-      expect(addedEvent.added[0].payload).toBe('payload');
-
-      const changedEvent = changeListener.mock.calls[1][0];
-      expect(changedEvent.changed[0].payload).toBe('updated');
     });
 
-    it('should dispatch change events when deleting a promise entry', () => {
-      const changeListener = vi.fn();
+    it("should dispatch resolve events when resolving a promise entry", async () => {
+      const resolveListener = vi.fn();
 
-      store.addEventListener('change', changeListener);
+      store.addEventListener("resolve", resolveListener);
 
-      const entry = store.add('payload');
+      const entry = store.add("payload");
+      entry.resolve("value");
+
+      await expect(entry.promise).resolves.toBe("value");
+
+      expect(resolveListener).toBeCalledTimes(1);
+      expect(resolveListener).toBeCalledWith({
+        type: "resolve",
+        entry,
+      });
+    });
+
+    it("should dispatch reject events when rejecting a promise entry", async () => {
+      const rejectListener = vi.fn();
+
+      store.addEventListener("reject", rejectListener);
+
+      const entry = store.add("payload");
+      entry.reject("reason");
+
+      await expect(entry.promise).rejects.toThrow("reason");
+
+      expect(rejectListener).toBeCalledTimes(1);
+      expect(rejectListener).toBeCalledWith({
+        type: "reject",
+        entry,
+      });
+    });
+
+    it("should dispatch delete events when deleting a promise entry", () => {
+      const deleteListener = vi.fn();
+
+      store.addEventListener("delete", deleteListener);
+
+      const entry = store.add("payload");
       store.delete(entry.id);
 
-      expect(changeListener).toBeCalledTimes(2);
-
-      expect(changeListener).nthCalledWith(1, {
-        type: 'change',
-        added: expect.arrayContaining([
-          expect.objectContaining({
-            payload: 'payload',
-          }),
-        ]),
-        changed: [],
-        deleted: [],
+      expect(deleteListener).toBeCalledTimes(1);
+      expect(deleteListener).toBeCalledWith({
+        type: "delete",
+        entry,
       });
-
-      expect(changeListener).nthCalledWith(2, {
-        type: 'change',
-        added: [],
-        changed: [],
-        deleted: expect.arrayContaining([
-          expect.objectContaining({
-            payload: 'payload',
-          }),
-        ]),
-      });
-
-      const deletedEvent = changeListener.mock.calls[1][0];
-      expect(deletedEvent.deleted[0].id).toBe(entry.id);
     });
 
-    it('should be able to add and remove event listeners', () => {
-      const changeListener = vi.fn();
+    it("should dispatch clear events when clearing all promise entries", () => {
+      const clearListener = vi.fn();
 
-      store.addEventListener('change', changeListener);
+      store.addEventListener("clear", clearListener);
 
-      store.add('payload');
+      const entry1 = store.add("payload1");
+      const entry2 = store.add("payload2");
+      store.clear();
 
-      expect(changeListener).toBeCalledTimes(1);
+      expect(clearListener).toBeCalledTimes(1);
+      expect(clearListener).toBeCalledWith({
+        type: "clear",
+        entries: [entry1, entry2],
+      });
+    });
 
-      store.removeEventListener('change', changeListener);
+    it("should be able to add and remove event listeners", () => {
+      const addListener = vi.fn();
 
-      store.add('payload');
+      store.addEventListener("add", addListener);
+      store.add("payload");
+      expect(addListener).toBeCalledTimes(1);
 
-      expect(changeListener).toBeCalledTimes(1);
+      store.removeEventListener("add", addListener);
+      store.add("payload");
+      expect(addListener).toBeCalledTimes(1);
+    });
+
+    it("should be able to remove all event listeners", () => {
+      const addListener = vi.fn();
+      const updateListener = vi.fn();
+
+      store.addEventListener("add", addListener);
+      store.addEventListener("update", updateListener);
+
+      store.removeEventListener("add", addListener);
+      store.removeEventListener("update", updateListener);
+
+      store.add("payload");
+      expect(addListener).not.toBeCalled();
+
+      const entry = store.add("payload");
+      store.update(entry.id, "updated");
+      expect(updateListener).not.toBeCalled();
     });
   });
 });

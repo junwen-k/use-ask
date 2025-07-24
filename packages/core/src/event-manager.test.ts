@@ -1,48 +1,58 @@
-import { describe, expect, it, vi } from 'vitest';
-import { type ChangeEvent, EventManager } from './event-manager';
+import { describe, expect, it, vi } from "vitest";
+import { type AddEvent, EventManager } from "./event-manager";
 
-describe('EventManager', () => {
-  it('should create a new event manager', () => {
+describe("EventManager", () => {
+  it("should create a new event manager", () => {
     const manager = new EventManager();
     expect(manager).toBeInstanceOf(EventManager);
   });
 
-  it('should add and remove event listeners', () => {
+  it("should add and remove event listeners", () => {
     const manager = new EventManager();
     const listener = vi.fn();
 
-    manager.addEventListener('change', listener);
+    manager.addEventListener("add", listener);
 
-    const event: ChangeEvent = {
-      type: 'change',
-      added: [],
-      changed: [],
-      deleted: [],
+    const event: AddEvent = {
+      type: "add",
+      entry: {
+        id: 1,
+        payload: "test",
+        safe: false,
+        promise: new Promise(vi.fn),
+        resolve: vi.fn(),
+        reject: vi.fn(),
+      },
     };
     manager.dispatchEvent(event);
 
     expect(listener).toBeCalledWith(event);
     expect(listener).toBeCalledTimes(1);
 
-    manager.removeEventListener('change', listener);
+    manager.removeEventListener("add", listener);
 
     manager.dispatchEvent(event);
     expect(listener).toBeCalledTimes(1);
   });
 
-  it('should handle multiple listeners for the same event type', () => {
+  it("should handle multiple listeners for the same event type", () => {
     const manager = new EventManager();
     const listener1 = vi.fn();
     const listener2 = vi.fn();
 
-    manager.addEventListener('change', listener1);
-    manager.addEventListener('change', listener2);
+    manager.addEventListener("add", listener1);
+    manager.addEventListener("add", listener2);
 
-    const event: ChangeEvent = {
-      type: 'change',
-      added: [],
-      changed: [],
-      deleted: [],
+    const event: AddEvent = {
+      type: "add",
+      entry: {
+        id: 1,
+        payload: "test",
+        safe: false,
+        promise: new Promise(vi.fn),
+        resolve: vi.fn(),
+        reject: vi.fn(),
+      },
     };
     manager.dispatchEvent(event);
 
@@ -52,21 +62,26 @@ describe('EventManager', () => {
     expect(listener2).toBeCalledTimes(1);
   });
 
-  it('should remove all listeners when no specific listener is provided', () => {
+  it("should remove all listeners when no specific listener is provided", () => {
     const manager = new EventManager();
     const listener1 = vi.fn();
     const listener2 = vi.fn();
 
-    manager.addEventListener('change', listener1);
-    manager.addEventListener('change', listener2);
+    manager.addEventListener("add", listener1);
+    manager.addEventListener("add", listener2);
 
-    manager.removeEventListener('change');
+    manager.removeEventListener("add");
 
-    const event: ChangeEvent = {
-      type: 'change',
-      added: [],
-      changed: [],
-      deleted: [],
+    const event: AddEvent = {
+      type: "add",
+      entry: {
+        id: 1,
+        payload: "test",
+        safe: false,
+        promise: new Promise(vi.fn),
+        resolve: vi.fn(),
+        reject: vi.fn(),
+      },
     };
     manager.dispatchEvent(event);
 
@@ -74,21 +89,26 @@ describe('EventManager', () => {
     expect(listener2).not.toBeCalled();
   });
 
-  it('should remove specific listener when provided', () => {
+  it("should remove specific listener when provided", () => {
     const manager = new EventManager();
     const listener1 = vi.fn();
     const listener2 = vi.fn();
 
-    manager.addEventListener('change', listener1);
-    manager.addEventListener('change', listener2);
+    manager.addEventListener("add", listener1);
+    manager.addEventListener("add", listener2);
 
-    manager.removeEventListener('change', listener1);
+    manager.removeEventListener("add", listener1);
 
-    const event: ChangeEvent = {
-      type: 'change',
-      added: [],
-      changed: [],
-      deleted: [],
+    const event: AddEvent = {
+      type: "add",
+      entry: {
+        id: 1,
+        payload: "test",
+        safe: false,
+        promise: new Promise(vi.fn),
+        resolve: vi.fn(),
+        reject: vi.fn(),
+      },
     };
     manager.dispatchEvent(event);
 
@@ -96,41 +116,51 @@ describe('EventManager', () => {
     expect(listener2).toBeCalled();
   });
 
-  it('should remove all event listeners', () => {
+  it("should remove all event listeners", () => {
     const manager = new EventManager();
-    const changeListener = vi.fn();
+    const addListener = vi.fn();
 
-    manager.addEventListener('change', changeListener);
+    manager.addEventListener("add", addListener);
 
     manager.removeAllEventListeners();
 
-    const event: ChangeEvent = {
-      type: 'change',
-      added: [],
-      changed: [],
-      deleted: [],
+    const event: AddEvent = {
+      type: "add",
+      entry: {
+        id: 1,
+        payload: "test",
+        safe: false,
+        promise: new Promise(vi.fn),
+        resolve: vi.fn(),
+        reject: vi.fn(),
+      },
     };
     manager.dispatchEvent(event);
 
-    expect(changeListener).not.toBeCalled();
+    expect(addListener).not.toBeCalled();
   });
 
-  it('should handle removing non-existent listeners gracefully', () => {
+  it("should handle removing non-existent listeners gracefully", () => {
     const manager = new EventManager();
     const listener = vi.fn();
 
     expect(() => {
-      manager.removeEventListener('change', listener);
+      manager.removeEventListener("add", listener);
     }).not.toThrow();
   });
 
-  it('should handle dispatching events with no listeners gracefully', () => {
+  it("should handle dispatching events with no listeners gracefully", () => {
     const manager = new EventManager();
-    const event: ChangeEvent = {
-      type: 'change',
-      added: [],
-      changed: [],
-      deleted: [],
+    const event: AddEvent = {
+      type: "add",
+      entry: {
+        id: 1,
+        payload: "test",
+        safe: false,
+        promise: new Promise(vi.fn),
+        resolve: vi.fn(),
+        reject: vi.fn(),
+      },
     };
 
     expect(() => {

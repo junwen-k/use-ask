@@ -1,0 +1,30 @@
+import type { PromiseStore } from "@use-ask/core";
+import { useSyncExternalStore } from "react";
+
+export function usePromiseStore<
+  TPayload = unknown,
+  TData = unknown,
+  TReason = unknown
+>(store: PromiseStore<TPayload, TData, TReason>) {
+  return useSyncExternalStore(
+    (listener) => {
+      store.addEventListener("add", listener);
+      store.addEventListener("update", listener);
+      store.addEventListener("resolve", listener);
+      store.addEventListener("reject", listener);
+      store.addEventListener("delete", listener);
+      store.addEventListener("clear", listener);
+
+      return () => {
+        store.removeEventListener("add", listener);
+        store.removeEventListener("update", listener);
+        store.removeEventListener("resolve", listener);
+        store.removeEventListener("reject", listener);
+        store.removeEventListener("delete", listener);
+        store.removeEventListener("clear", listener);
+      };
+    },
+    () => store.entries,
+    () => store.entries
+  );
+}

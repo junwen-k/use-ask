@@ -1,4 +1,4 @@
-import { type ChangeEvent, EventManager } from './event-manager';
+import { type Event, EventManager } from "./event-manager";
 
 export type Id = number;
 
@@ -19,7 +19,7 @@ export interface SafeRejectedResult<TReason = unknown> {
 export type PromiseEntry<
   TPayload = unknown,
   TData = unknown,
-  TReason = unknown,
+  TReason = unknown
 > =
   | PromiseEntryUnsafe<TPayload, TData, TReason>
   | PromiseEntrySafe<TPayload, TData, TReason>;
@@ -27,7 +27,7 @@ export type PromiseEntry<
 export interface PromiseEntryBase<
   TPayload = unknown,
   TData = unknown,
-  TReason = unknown,
+  TReason = unknown
 > {
   id: Id;
   payload: TPayload;
@@ -38,7 +38,7 @@ export interface PromiseEntryBase<
 export interface PromiseEntryUnsafe<
   TPayload = unknown,
   TData = unknown,
-  TReason = unknown,
+  TReason = unknown
 > extends PromiseEntryBase<TPayload, TData, TReason> {
   promise: Promise<TData>;
   safe: false;
@@ -47,7 +47,7 @@ export interface PromiseEntryUnsafe<
 export interface PromiseEntrySafe<
   TPayload = unknown,
   TData = unknown,
-  TReason = unknown,
+  TReason = unknown
 > extends PromiseEntryBase<TPayload, TData, TReason> {
   promise: Promise<SafeResult<TData, TReason>>;
   safe: true;
@@ -56,7 +56,7 @@ export interface PromiseEntrySafe<
 export class PromiseStore<
   TPayload = unknown,
   TData = unknown,
-  TReason = unknown,
+  TReason = unknown
 > {
   #stack: Map<Id, PromiseEntry<TPayload, TData, TReason>> = new Map();
   #snapshot: PromiseEntry<TPayload, TData, TReason>[] | null = null;
@@ -105,18 +105,9 @@ export class PromiseStore<
     this.#changeVersion++;
   }
 
-  #dispatchChangeEvent({
-    added,
-    changed,
-    deleted,
-  }: Omit<ChangeEvent<TPayload, TData, TReason>, 'type'>) {
+  #dispatchEvent(event: Event<TPayload, TData, TReason>) {
     this.#invalidateSnapshot();
-    this.#eventManager.dispatchEvent({
-      type: 'change',
-      added,
-      changed,
-      deleted,
-    });
+    this.#eventManager.dispatchEvent(event);
   }
 
   #addPromise(
@@ -140,6 +131,10 @@ export class PromiseStore<
       } else {
         resolvePromise(data);
       }
+      this.#dispatchEvent({
+        type: "resolve",
+        entry,
+      });
     };
 
     const reject = (reason?: TReason) => {
@@ -148,6 +143,10 @@ export class PromiseStore<
       } else {
         rejectPromise(reason);
       }
+      this.#dispatchEvent({
+        type: "reject",
+        entry,
+      });
     };
 
     const id = this.#generateId();
@@ -164,10 +163,9 @@ export class PromiseStore<
 
     this.#stack.set(entry.id, entry);
 
-    this.#dispatchChangeEvent({
-      added: [entry],
-      changed: [],
-      deleted: [],
+    this.#dispatchEvent({
+      type: "add",
+      entry,
     });
 
     return entry;
@@ -217,10 +215,9 @@ export class PromiseStore<
 
     this.#stack.set(id, newEntry);
 
-    this.#dispatchChangeEvent({
-      added: [],
-      changed: [newEntry],
-      deleted: [],
+    this.#dispatchEvent({
+      type: "update",
+      entry: newEntry,
     });
 
     return entry;
@@ -237,10 +234,9 @@ export class PromiseStore<
 
     this.#stack.delete(id);
 
-    this.#dispatchChangeEvent({
-      added: [],
-      changed: [],
-      deleted: [entry],
+    this.#dispatchEvent({
+      type: "delete",
+      entry,
     });
 
     return entry;
@@ -254,10 +250,9 @@ export class PromiseStore<
 
     this.#stack.clear();
 
-    this.#dispatchChangeEvent({
-      added: [],
-      changed: [],
-      deleted,
+    this.#dispatchEvent({
+      type: "clear",
+      entries: deleted,
     });
   }
 
@@ -266,7 +261,7 @@ export class PromiseStore<
    */
   addEventListener(
     ...args: Parameters<
-      EventManager<TPayload, TData, TReason>['addEventListener']
+      EventManager<TPayload, TData, TReason>["addEventListener"]
     >
   ) {
     this.#eventManager.addEventListener(...args);
@@ -277,7 +272,7 @@ export class PromiseStore<
    */
   removeEventListener(
     ...args: Parameters<
-      EventManager<TPayload, TData, TReason>['removeEventListener']
+      EventManager<TPayload, TData, TReason>["removeEventListener"]
     >
   ) {
     this.#eventManager.removeEventListener(...args);

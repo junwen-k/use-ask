@@ -5,6 +5,9 @@
   "[svelte]": {
     "editor.defaultFormatter": "svelte.svelte-vscode"
   },
+  "[vue]": {
+    "editor.defaultFormatter": "Vue.volar"
+  },
   "svelte.enable-ts-plugin": true,
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",

@@ -113,10 +113,19 @@ describe("PromiseStore", () => {
 
       screen.unmount();
 
-      expect(removeEventListenerSpy).toHaveBeenCalledWith(
-        "change",
-        expect.any(Function)
-      );
+      for (const event of [
+        "add",
+        "update",
+        "resolve",
+        "reject",
+        "delete",
+        "clear",
+      ]) {
+        expect(removeEventListenerSpy).toHaveBeenCalledWith(
+          event,
+          expect.any(Function)
+        );
+      }
       removeEventListenerSpy.mockRestore();
     });
   });

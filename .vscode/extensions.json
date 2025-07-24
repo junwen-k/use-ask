@@ -1,3 +1,8 @@
 {
-  "recommendations": ["biomejs.biome", "Vercel.turbo-vsc"]
+  "recommendations": [
+    "biomejs.biome",
+    "svelte.svelte-vscode",
+    "Vercel.turbo-vsc",
+    "Vue.volar"
+  ]
 }

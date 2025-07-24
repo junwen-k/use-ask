@@ -14,8 +14,21 @@ export class PromiseStore<
     this.#subscribe = createSubscriber((update) => {
       const listener = () => update();
 
-      this.addEventListener("change", listener);
-      return () => this.removeEventListener("change", listener);
+      this.addEventListener("add", listener);
+      this.addEventListener("update", listener);
+      this.addEventListener("resolve", listener);
+      this.addEventListener("reject", listener);
+      this.addEventListener("delete", listener);
+      this.addEventListener("clear", listener);
+
+      return () => {
+        this.removeEventListener("add", listener);
+        this.removeEventListener("update", listener);
+        this.removeEventListener("resolve", listener);
+        this.removeEventListener("reject", listener);
+        this.removeEventListener("delete", listener);
+        this.removeEventListener("clear", listener);
+      };
     });
   }
 

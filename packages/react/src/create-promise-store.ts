@@ -1,22 +1,12 @@
-import { PromiseStore } from '@use-ask/core';
-import { useCallback, useSyncExternalStore } from 'react';
+import { PromiseStore } from "@use-ask/core";
+import { usePromiseStore } from "./use-promise-store";
 
-export const createPromiseStore = <P, TData = unknown, TReason = unknown>() => {
-  const store = new PromiseStore<P, TData, TReason>();
+export function createPromiseStore<
+  TPayload = unknown,
+  TData = unknown,
+  TReason = unknown
+>() {
+  const store = new PromiseStore<TPayload, TData, TReason>();
 
-  return [
-    store,
-    () =>
-      useSyncExternalStore(
-        useCallback((listener) => {
-          store.addEventListener('change', listener);
-
-          return () => {
-            store.removeEventListener('change', listener);
-          };
-        }, []),
-        () => store.entries,
-        () => store.entries
-      ),
-  ] as const;
-};
+  return [store, () => usePromiseStore(store)] as const;
+}
