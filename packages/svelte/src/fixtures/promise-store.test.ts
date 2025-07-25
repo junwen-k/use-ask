@@ -116,6 +116,7 @@ describe("PromiseStore", () => {
       for (const event of [
         "add",
         "update",
+        "settled",
         "resolve",
         "reject",
         "delete",

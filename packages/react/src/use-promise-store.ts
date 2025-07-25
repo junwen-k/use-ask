@@ -10,6 +10,7 @@ export function usePromiseStore<
     (listener) => {
       store.addEventListener("add", listener);
       store.addEventListener("update", listener);
+      store.addEventListener("settled", listener);
       store.addEventListener("resolve", listener);
       store.addEventListener("reject", listener);
       store.addEventListener("delete", listener);
@@ -18,6 +19,7 @@ export function usePromiseStore<
       return () => {
         store.removeEventListener("add", listener);
         store.removeEventListener("update", listener);
+        store.removeEventListener("settled", listener);
         store.removeEventListener("resolve", listener);
         store.removeEventListener("reject", listener);
         store.removeEventListener("delete", listener);

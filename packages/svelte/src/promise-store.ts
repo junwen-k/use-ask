@@ -16,6 +16,7 @@ export class PromiseStore<
 
       this.addEventListener("add", listener);
       this.addEventListener("update", listener);
+      this.addEventListener("settled", listener);
       this.addEventListener("resolve", listener);
       this.addEventListener("reject", listener);
       this.addEventListener("delete", listener);
@@ -24,6 +25,7 @@ export class PromiseStore<
       return () => {
         this.removeEventListener("add", listener);
         this.removeEventListener("update", listener);
+        this.removeEventListener("settled", listener);
         this.removeEventListener("resolve", listener);
         this.removeEventListener("reject", listener);
         this.removeEventListener("delete", listener);

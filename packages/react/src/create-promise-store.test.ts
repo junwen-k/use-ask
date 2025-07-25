@@ -35,13 +35,18 @@ describe("createPromiseStore", () => {
 
       const { result } = renderHook(() => useEntries());
 
-      act(() => {
-        const entry = store.add("test");
+      act(() => store.add("test"));
+      expect(result.current).toHaveLength(1);
 
-        store.get(entry.id)?.resolve("success");
+      const entry = store.get(result.current[0].id);
+      expect(entry).toBeDefined();
+
+      await act(async () => {
+        entry?.resolve("success");
+        await expect(entry?.promise).resolves.toBe("success");
       });
 
-      await expect(result.current[0].promise).resolves.toBe("success");
+      expect(result.current).toHaveLength(0);
     });
 
     it("should handle promise rejection", async () => {
@@ -49,13 +54,18 @@ describe("createPromiseStore", () => {
 
       const { result } = renderHook(() => useEntries());
 
-      act(() => {
-        const entry = store.add("test");
+      act(() => store.add("test"));
+      expect(result.current).toHaveLength(1);
 
-        store.get(entry.id)?.reject("error");
+      const entry = store.get(result.current[0].id);
+      expect(entry).toBeDefined();
+
+      await act(async () => {
+        entry?.reject("error");
+        await expect(entry?.promise).rejects.toBe("error");
       });
 
-      await expect(result.current[0].promise).rejects.toThrow("error");
+      expect(result.current).toHaveLength(0);
     });
 
     it("should handle safe promise resolution", async () => {
@@ -63,16 +73,21 @@ describe("createPromiseStore", () => {
 
       const { result } = renderHook(() => useEntries());
 
-      act(() => {
-        const entry = store.addSafe("test");
+      act(() => store.addSafe("test"));
+      expect(result.current).toHaveLength(1);
 
-        store.get(entry.id)?.resolve("success");
+      const entry = store.get(result.current[0].id);
+      expect(entry).toBeDefined();
+
+      await act(async () => {
+        entry?.resolve("success");
+        await expect(entry?.promise).resolves.toEqual({
+          ok: true,
+          data: "success",
+        });
       });
 
-      await expect(result.current[0].promise).resolves.toEqual({
-        ok: true,
-        data: "success",
-      });
+      expect(result.current).toHaveLength(0);
     });
 
     it("should handle safe promise rejection", async () => {
@@ -80,15 +95,18 @@ describe("createPromiseStore", () => {
 
       const { result } = renderHook(() => useEntries());
 
-      act(() => {
-        const entry = store.addSafe("test");
+      act(() => store.addSafe("test"));
+      expect(result.current).toHaveLength(1);
 
-        store.get(entry.id)?.reject();
-      });
+      const entry = store.get(result.current[0].id);
+      expect(entry).toBeDefined();
 
-      await expect(result.current[0].promise).resolves.toEqual({
-        ok: false,
-        reason: undefined,
+      await act(async () => {
+        entry?.reject();
+        await expect(entry?.promise).resolves.toEqual({
+          ok: false,
+          reason: undefined,
+        });
       });
     });
 
@@ -101,13 +119,9 @@ describe("createPromiseStore", () => {
         store.add("test1");
         store.add("test2");
       });
-
       expect(result.current).toHaveLength(2);
 
-      act(() => {
-        store.clear();
-      });
-
+      act(() => store.clear());
       expect(result.current).toHaveLength(0);
     });
 
@@ -122,6 +136,7 @@ describe("createPromiseStore", () => {
       for (const event of [
         "add",
         "update",
+        "settled",
         "resolve",
         "reject",
         "delete",

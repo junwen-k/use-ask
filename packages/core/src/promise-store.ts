@@ -1,4 +1,4 @@
-import { type Event, EventManager } from "./event-manager";
+import { type Event, EventManager, type EventType } from "./event-manager";
 
 export type Id = number;
 
@@ -135,6 +135,8 @@ export class PromiseStore<
         type: "resolve",
         entry,
       });
+
+      this.#deletePromise(entry.id, "settled");
     };
 
     const reject = (reason?: TReason) => {
@@ -147,6 +149,8 @@ export class PromiseStore<
         type: "reject",
         entry,
       });
+
+      this.#deletePromise(entry.id, "settled");
     };
 
     const id = this.#generateId();
@@ -165,6 +169,22 @@ export class PromiseStore<
 
     this.#dispatchEvent({
       type: "add",
+      entry,
+    });
+
+    return entry;
+  }
+
+  #deletePromise(id: Id, eventType: Extract<EventType, "delete" | "settled">) {
+    const entry = this.#stack.get(id);
+    if (!entry) {
+      return;
+    }
+
+    this.#stack.delete(id);
+
+    this.#dispatchEvent({
+      type: eventType,
       entry,
     });
 
@@ -227,19 +247,7 @@ export class PromiseStore<
    * Deletes a promise entry from the store.
    */
   delete(id: Id) {
-    const entry = this.#stack.get(id);
-    if (!entry) {
-      return;
-    }
-
-    this.#stack.delete(id);
-
-    this.#dispatchEvent({
-      type: "delete",
-      entry,
-    });
-
-    return entry;
+    return this.#deletePromise(id, "delete");
   }
 
   /**

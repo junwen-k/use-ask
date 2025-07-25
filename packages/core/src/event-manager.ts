@@ -9,6 +9,7 @@ export type EventType =
   | RejectEvent["type"]
   | UpdateEvent["type"]
   | DeleteEvent["type"]
+  | SettledEvent["type"]
   | ClearEvent["type"];
 
 /**
@@ -24,6 +25,8 @@ type EventByType<T, TPayload, TData, TReason> = T extends "add"
   ? UpdateEvent<TPayload, TData, TReason>
   : T extends "delete"
   ? DeleteEvent<TPayload, TData, TReason>
+  : T extends "settled"
+  ? SettledEvent<TPayload, TData, TReason>
   : T extends "clear"
   ? ClearEvent<TPayload, TData, TReason>
   : never;
@@ -70,6 +73,15 @@ export interface RejectEvent<
   entry: PromiseEntry<TPayload, TData, TReason>;
 }
 
+export interface SettledEvent<
+  TPayload = unknown,
+  TData = unknown,
+  TReason = unknown
+> extends BaseEvent {
+  type: "settled";
+  entry: PromiseEntry<TPayload, TData, TReason>;
+}
+
 export interface DeleteEvent<
   TPayload = unknown,
   TData = unknown,
@@ -87,6 +99,7 @@ export interface ClearEvent<
   type: "clear";
   entries: PromiseEntry<TPayload, TData, TReason>[];
 }
+
 /**
  * Type representing all possible event types.
  */
@@ -96,6 +109,7 @@ export type Event<TPayload = unknown, TData = unknown, TReason = unknown> =
   | RejectEvent<TPayload, TData, TReason>
   | UpdateEvent<TPayload, TData, TReason>
   | DeleteEvent<TPayload, TData, TReason>
+  | SettledEvent<TPayload, TData, TReason>
   | ClearEvent<TPayload, TData, TReason>;
 
 export type EventListener<T extends EventType, TPayload, TData, TReason> = (
