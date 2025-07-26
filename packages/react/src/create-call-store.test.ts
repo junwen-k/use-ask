@@ -1,29 +1,29 @@
 import { act, renderHook } from "@testing-library/react";
-import { PromiseStore } from "@use-ask/core";
+import { CallStore } from "@ui-call/core";
 import { describe, expect, it, vi } from "vitest";
-import { createPromiseStore } from "./create-promise-store";
+import { createCallStore } from "./create-call-store";
 
 // We polyfill `Promise.withResolvers` because it is not available in Node environment.
 import "@ungap/with-resolvers";
 
-describe("createPromiseStore", () => {
+describe("createCallStore", () => {
   describe("Initialization", () => {
     it("should create a new store and use snapshot hook", () => {
-      const [store, useEntries] = createPromiseStore();
+      const [store, useEntries] = createCallStore();
 
-      expect(store).toBeInstanceOf(PromiseStore);
+      expect(store).toBeInstanceOf(CallStore);
       expect(useEntries).toBeInstanceOf(Function);
     });
   });
 
   describe("Store Operations", () => {
     it("should reflect store changes in entries", () => {
-      const [store, useEntries] = createPromiseStore();
+      const [store, useEntries] = createCallStore();
 
       const { result } = renderHook(() => useEntries());
 
       act(() => {
-        store.add("test");
+        store.call("test");
       });
 
       expect(result.current).toHaveLength(1);
@@ -31,11 +31,11 @@ describe("createPromiseStore", () => {
     });
 
     it("should handle promise resolution", async () => {
-      const [store, useEntries] = createPromiseStore();
+      const [store, useEntries] = createCallStore();
 
       const { result } = renderHook(() => useEntries());
 
-      act(() => store.add("test"));
+      act(() => store.call("test"));
       expect(result.current).toHaveLength(1);
 
       const entry = store.get(result.current[0].id);
@@ -50,11 +50,11 @@ describe("createPromiseStore", () => {
     });
 
     it("should handle promise rejection", async () => {
-      const [store, useEntries] = createPromiseStore();
+      const [store, useEntries] = createCallStore();
 
       const { result } = renderHook(() => useEntries());
 
-      act(() => store.add("test"));
+      act(() => store.call("test"));
       expect(result.current).toHaveLength(1);
 
       const entry = store.get(result.current[0].id);
@@ -69,11 +69,11 @@ describe("createPromiseStore", () => {
     });
 
     it("should handle safe promise resolution", async () => {
-      const [store, useEntries] = createPromiseStore();
+      const [store, useEntries] = createCallStore();
 
       const { result } = renderHook(() => useEntries());
 
-      act(() => store.addSafe("test"));
+      act(() => store.callSafe("test"));
       expect(result.current).toHaveLength(1);
 
       const entry = store.get(result.current[0].id);
@@ -91,11 +91,11 @@ describe("createPromiseStore", () => {
     });
 
     it("should handle safe promise rejection", async () => {
-      const [store, useEntries] = createPromiseStore();
+      const [store, useEntries] = createCallStore();
 
       const { result } = renderHook(() => useEntries());
 
-      act(() => store.addSafe("test"));
+      act(() => store.callSafe("test"));
       expect(result.current).toHaveLength(1);
 
       const entry = store.get(result.current[0].id);
@@ -111,13 +111,13 @@ describe("createPromiseStore", () => {
     });
 
     it("should update entries when store is cleared", () => {
-      const [store, useEntries] = createPromiseStore();
+      const [store, useEntries] = createCallStore();
 
       const { result } = renderHook(() => useEntries());
 
       act(() => {
-        store.add("test1");
-        store.add("test2");
+        store.call("test1");
+        store.call("test2");
       });
       expect(result.current).toHaveLength(2);
 
@@ -126,7 +126,7 @@ describe("createPromiseStore", () => {
     });
 
     it("should cleanup event listeners when hook unmounts", () => {
-      const [store, useEntries] = createPromiseStore();
+      const [store, useEntries] = createCallStore();
       const { unmount } = renderHook(() => useEntries());
 
       const removeEventListenerSpy = vi.spyOn(store, "removeEventListener");

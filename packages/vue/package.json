@@ -1,6 +1,6 @@
 {
-  "name": "@use-ask/vue",
-  "description": "Vue package for use-ask",
+  "name": "@ui-call/vue",
+  "description": "Vue UI call store for managing async, stackable user interactions.",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -23,7 +23,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@use-ask/core": "workspace:*"
+    "@ui-call/core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",

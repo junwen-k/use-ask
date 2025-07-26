@@ -1,6 +1,6 @@
 {
-  "name": "@use-ask/svelte",
-  "description": "Svelte package for use-ask",
+  "name": "@ui-call/svelte",
+  "description": "Svelte UI call store for managing async, stackable user interactions.",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -23,7 +23,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@use-ask/core": "workspace:*"
+    "@ui-call/core": "workspace:*"
   },
   "devDependencies": {
     "svelte": "^5.36.8",

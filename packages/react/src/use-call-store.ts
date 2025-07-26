@@ -1,11 +1,11 @@
-import type { PromiseStore } from "@use-ask/core";
+import type { CallStore } from "@ui-call/core";
 import { useSyncExternalStore } from "react";
 
-export function usePromiseStore<
+export function useCallStore<
   TPayload = unknown,
   TData = unknown,
   TReason = unknown
->(store: PromiseStore<TPayload, TData, TReason>) {
+>(store: CallStore<TPayload, TData, TReason>) {
   return useSyncExternalStore(
     (listener) => {
       store.addEventListener("add", listener);

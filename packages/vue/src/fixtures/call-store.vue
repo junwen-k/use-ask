@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { usePromiseStore } from "../use-promise-store";
+import { useCallStore } from "../use-call-store";
 
-const store = usePromiseStore();
+const store = useCallStore();
 </script>
 
 <template>
-  <button data-testid="add" @click="store.add('test')">Add</button>
-  <button data-testid="addSafe" @click="store.addSafe('test')">Add Safe</button>
+  <button data-testid="call" @click="store.call('test')">Call</button>
+  <button data-testid="callSafe" @click="store.callSafe('test')">Call Safe</button>
   <button data-testid="clear" @click="store.clear()">Clear</button>
   <div v-for="entry in store.entries" :key="entry.id" data-testid="entry">
     <p data-testid="payload">{{ entry.payload }}</p>

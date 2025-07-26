@@ -1,11 +1,11 @@
-import { PromiseStore as CorePromiseStore } from "@use-ask/core";
+import { CallStore as CoreCallStore } from "@ui-call/core";
 import { createSubscriber } from "svelte/reactivity";
 
-export class PromiseStore<
+export class CallStore<
   TPayload = unknown,
   TData = unknown,
   TReason = unknown
-> extends CorePromiseStore<TPayload, TData, TReason> {
+> extends CoreCallStore<TPayload, TData, TReason> {
   #subscribe: () => void;
 
   constructor() {

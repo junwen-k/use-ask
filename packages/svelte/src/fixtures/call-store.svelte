@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { PromiseStore } from "../promise-store";
+  import type { CallStore } from "../call-store";
 
   interface Props {
-    store: PromiseStore;
+    store: CallStore;
   }
 
   const { store }: Props = $props();

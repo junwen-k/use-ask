@@ -1,18 +1,18 @@
 import { describe, expect, it, vi } from "vitest";
 import { render } from "vitest-browser-svelte";
-import { PromiseStore } from "../promise-store";
-import Component from "./promise-store.svelte";
+import { CallStore } from "../call-store";
+import Component from "./call-store.svelte";
 
-describe("PromiseStore", () => {
+describe("CallStore", () => {
   describe("Store Operations", () => {
     it("should reflect store changes in entries", async () => {
-      const store = new PromiseStore();
+      const store = new CallStore();
 
       const screen = render(Component, {
         store,
       });
 
-      store.add("test");
+      store.call("test");
 
       await expect
         .element(screen.getByTestId("payload"))
@@ -20,13 +20,13 @@ describe("PromiseStore", () => {
     });
 
     it("should handle promise resolution", async () => {
-      const store = new PromiseStore();
+      const store = new CallStore();
 
       const screen = render(Component, {
         store,
       });
 
-      const entry = store.add("test");
+      const entry = store.call("test");
 
       await screen.getByTestId("resolve").click();
 
@@ -34,13 +34,13 @@ describe("PromiseStore", () => {
     });
 
     it("should handle promise rejection", async () => {
-      const store = new PromiseStore();
+      const store = new CallStore();
 
       const screen = render(Component, {
         store,
       });
 
-      const entry = store.add("test");
+      const entry = store.call("test");
 
       await screen.getByTestId("reject").click();
 
@@ -48,13 +48,13 @@ describe("PromiseStore", () => {
     });
 
     it("should handle safe promise resolution", async () => {
-      const store = new PromiseStore();
+      const store = new CallStore();
 
       const screen = render(Component, {
         store,
       });
 
-      const entry = store.addSafe("test");
+      const entry = store.callSafe("test");
 
       await screen.getByTestId("resolve").click();
 
@@ -65,13 +65,13 @@ describe("PromiseStore", () => {
     });
 
     it("should handle safe promise rejection", async () => {
-      const store = new PromiseStore();
+      const store = new CallStore();
 
       const screen = render(Component, {
         store,
       });
 
-      const entry = store.addSafe("test");
+      const entry = store.callSafe("test");
 
       await screen.getByTestId("reject").click();
 
@@ -82,14 +82,14 @@ describe("PromiseStore", () => {
     });
 
     it("should update entries when store is cleared", async () => {
-      const store = new PromiseStore();
+      const store = new CallStore();
 
       const screen = render(Component, {
         store,
       });
 
-      store.add("test1");
-      store.add("test2");
+      store.call("test1");
+      store.call("test2");
 
       await expect
         .poll(() => screen.getByTestId("entry").elements().length)
@@ -103,7 +103,7 @@ describe("PromiseStore", () => {
     });
 
     it("should cleanup event listeners when component unmounts", () => {
-      const store = new PromiseStore();
+      const store = new CallStore();
 
       const removeEventListenerSpy = vi.spyOn(store, "removeEventListener");
 

@@ -1,12 +1,12 @@
-import { PromiseStore as CorePromiseStore } from "@use-ask/core";
+import { CallStore as CoreCallStore } from "@ui-call/core";
 import { onBeforeUnmount, ref } from "vue";
 
-export function usePromiseStore<
+export function useCallStore<
   TPayload = unknown,
   TData = unknown,
   TReason = unknown
 >() {
-  const store = new CorePromiseStore<TPayload, TData, TReason>();
+  const store = new CoreCallStore<TPayload, TData, TReason>();
   const entries = ref(store.entries);
 
   const listener = () => {
@@ -32,8 +32,8 @@ export function usePromiseStore<
   });
 
   return {
-    add: store.add.bind(store),
-    addSafe: store.addSafe.bind(store),
+    call: store.call.bind(store),
+    callSafe: store.callSafe.bind(store),
     get: store.get.bind(store),
     getAll: store.getAll.bind(store),
     update: store.update.bind(store),
