@@ -1,4 +1,4 @@
-import type { PromiseEntry } from "./promise-store";
+import type { PromiseEntry } from "./call-store";
 
 /**
  * Represents the different types of events that can be dispatched.

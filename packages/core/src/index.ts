@@ -1,3 +1,3 @@
 /* v8 ignore start */
-export * from "./promise-store";
+export * from "./call-store";
 /* v8 ignore stop */

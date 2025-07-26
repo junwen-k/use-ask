@@ -53,11 +53,7 @@ export interface PromiseEntrySafe<
   safe: true;
 }
 
-export class PromiseStore<
-  TPayload = unknown,
-  TData = unknown,
-  TReason = unknown
-> {
+export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
   #stack: Map<Id, PromiseEntry<TPayload, TData, TReason>> = new Map();
   #snapshot: PromiseEntry<TPayload, TData, TReason>[] | null = null;
 
@@ -194,14 +190,14 @@ export class PromiseStore<
   /**
    * Adds a pending promise entry to the store, returning the promise directly.
    */
-  add(payload: TPayload) {
+  call(payload: TPayload) {
     return this.#addPromise(payload, false);
   }
 
   /**
    * Adds a safe pending promise entry to the store, returning the promise directly.
    */
-  addSafe(payload: TPayload) {
+  callSafe(payload: TPayload) {
     return this.#addPromise(payload, true);
   }
 

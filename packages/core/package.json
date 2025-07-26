@@ -1,6 +1,6 @@
 {
-  "name": "@use-ask/core",
-  "description": "Observable promise store for managing async state.",
+  "name": "@ui-call/core",
+  "description": "Imperative UI call store for managing async, stackable user interactions across frameworks.",
   "version": "1.0.0",
   "private": true,
   "type": "module",
