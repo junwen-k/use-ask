@@ -1,13 +1,12 @@
-import { CallStore as CoreCallStore } from "@ui-call/core";
-import { onBeforeUnmount, ref } from "vue";
+import type { CallStore } from "@ui-call/core";
+import { onBeforeUnmount, readonly, shallowRef } from "vue";
 
 export function useCallStore<
   TPayload = unknown,
   TData = unknown,
   TReason = unknown
->() {
-  const store = new CoreCallStore<TPayload, TData, TReason>();
-  const entries = ref(store.entries);
+>(store: CallStore<TPayload, TData, TReason>) {
+  const entries = shallowRef(store.entries);
 
   const listener = () => {
     entries.value = store.entries;
@@ -31,16 +30,5 @@ export function useCallStore<
     store.removeEventListener("clear", listener);
   });
 
-  return {
-    call: store.call.bind(store),
-    callSafe: store.callSafe.bind(store),
-    get: store.get.bind(store),
-    getAll: store.getAll.bind(store),
-    update: store.update.bind(store),
-    delete: store.delete.bind(store),
-    clear: store.clear.bind(store),
-    get entries() {
-      return entries.value;
-    },
-  };
+  return readonly(entries);
 }
