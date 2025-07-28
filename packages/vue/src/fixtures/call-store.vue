@@ -6,16 +6,16 @@ const { store } = defineProps<{
   store: CallStore;
 }>();
 
-const entries = useCallStore(store);
+const callStacks = useCallStore(store);
 </script>
 
 <template>
-  <div v-for="entry in entries" :key="entry.id" data-testid="entry">
-    <p data-testid="payload">{{ entry.payload }}</p>
-    <button data-testid="resolve" @click="() => entry.resolve(true)">
+  <div v-for="callStack in callStacks" :key="callStack.id" data-testid="callStack">
+    <p data-testid="payload">{{ callStack.payload }}</p>
+    <button data-testid="resolve" @click="() => callStack.resolve(true)">
       OK
     </button>
-    <button data-testid="reject" @click="() => entry.reject()">
+    <button data-testid="reject" @click="() => callStack.reject()">
       Cancel
     </button>
   </div>

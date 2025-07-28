@@ -1,35 +1,35 @@
-import type { PromiseEntry } from "./call-store";
+import type { CallStack } from './call-store';
 
 /**
  * Represents the different types of events that can be dispatched.
  */
 export type EventType =
-  | AddEvent["type"]
-  | ResolveEvent["type"]
-  | RejectEvent["type"]
-  | UpdateEvent["type"]
-  | DeleteEvent["type"]
-  | SettledEvent["type"]
-  | ClearEvent["type"];
+  | AddEvent['type']
+  | ResolveEvent['type']
+  | RejectEvent['type']
+  | UpdateEvent['type']
+  | DeleteEvent['type']
+  | SettledEvent['type']
+  | ClearEvent['type'];
 
 /**
  * Maps an event type string to its respective event interface.
  */
-type EventByType<T, TPayload, TData, TReason> = T extends "add"
+type EventByType<T, TPayload, TData, TReason> = T extends 'add'
   ? AddEvent<TPayload, TData, TReason>
-  : T extends "resolve"
-  ? ResolveEvent<TPayload, TData, TReason>
-  : T extends "reject"
-  ? RejectEvent<TPayload, TData, TReason>
-  : T extends "update"
-  ? UpdateEvent<TPayload, TData, TReason>
-  : T extends "delete"
-  ? DeleteEvent<TPayload, TData, TReason>
-  : T extends "settled"
-  ? SettledEvent<TPayload, TData, TReason>
-  : T extends "clear"
-  ? ClearEvent<TPayload, TData, TReason>
-  : never;
+  : T extends 'resolve'
+    ? ResolveEvent<TPayload, TData, TReason>
+    : T extends 'reject'
+      ? RejectEvent<TPayload, TData, TReason>
+      : T extends 'update'
+        ? UpdateEvent<TPayload, TData, TReason>
+        : T extends 'delete'
+          ? DeleteEvent<TPayload, TData, TReason>
+          : T extends 'settled'
+            ? SettledEvent<TPayload, TData, TReason>
+            : T extends 'clear'
+              ? ClearEvent<TPayload, TData, TReason>
+              : never;
 
 /**
  * Base interface for all events.
@@ -38,66 +38,45 @@ export interface BaseEvent {
   type: EventType;
 }
 
-export interface AddEvent<
-  TPayload = unknown,
-  TData = unknown,
-  TReason = unknown
-> extends BaseEvent {
-  type: "add";
-  entry: PromiseEntry<TPayload, TData, TReason>;
+export interface AddEvent<TPayload = unknown, TData = unknown, TReason = unknown>
+  extends BaseEvent {
+  type: 'add';
+  callStack: CallStack<TPayload, TData, TReason>;
 }
 
-export interface UpdateEvent<
-  TPayload = unknown,
-  TData = unknown,
-  TReason = unknown
-> extends BaseEvent {
-  type: "update";
-  entry: PromiseEntry<TPayload, TData, TReason>;
+export interface UpdateEvent<TPayload = unknown, TData = unknown, TReason = unknown>
+  extends BaseEvent {
+  type: 'update';
+  callStack: CallStack<TPayload, TData, TReason>;
 }
-export interface ResolveEvent<
-  TPayload = unknown,
-  TData = unknown,
-  TReason = unknown
-> extends BaseEvent {
-  type: "resolve";
-  entry: PromiseEntry<TPayload, TData, TReason>;
+export interface ResolveEvent<TPayload = unknown, TData = unknown, TReason = unknown>
+  extends BaseEvent {
+  type: 'resolve';
+  callStack: CallStack<TPayload, TData, TReason>;
 }
 
-export interface RejectEvent<
-  TPayload = unknown,
-  TData = unknown,
-  TReason = unknown
-> extends BaseEvent {
-  type: "reject";
-  entry: PromiseEntry<TPayload, TData, TReason>;
+export interface RejectEvent<TPayload = unknown, TData = unknown, TReason = unknown>
+  extends BaseEvent {
+  type: 'reject';
+  callStack: CallStack<TPayload, TData, TReason>;
 }
 
-export interface SettledEvent<
-  TPayload = unknown,
-  TData = unknown,
-  TReason = unknown
-> extends BaseEvent {
-  type: "settled";
-  entry: PromiseEntry<TPayload, TData, TReason>;
+export interface SettledEvent<TPayload = unknown, TData = unknown, TReason = unknown>
+  extends BaseEvent {
+  type: 'settled';
+  callStack: CallStack<TPayload, TData, TReason>;
 }
 
-export interface DeleteEvent<
-  TPayload = unknown,
-  TData = unknown,
-  TReason = unknown
-> extends BaseEvent {
-  type: "delete";
-  entry: PromiseEntry<TPayload, TData, TReason>;
+export interface DeleteEvent<TPayload = unknown, TData = unknown, TReason = unknown>
+  extends BaseEvent {
+  type: 'delete';
+  callStack: CallStack<TPayload, TData, TReason>;
 }
 
-export interface ClearEvent<
-  TPayload = unknown,
-  TData = unknown,
-  TReason = unknown
-> extends BaseEvent {
-  type: "clear";
-  entries: PromiseEntry<TPayload, TData, TReason>[];
+export interface ClearEvent<TPayload = unknown, TData = unknown, TReason = unknown>
+  extends BaseEvent {
+  type: 'clear';
+  callStacks: Array<CallStack<TPayload, TData, TReason>>;
 }
 
 /**
@@ -119,11 +98,7 @@ export type EventListener<T extends EventType, TPayload, TData, TReason> = (
 /**
  * Manages registration and dispatching of event listeners.
  */
-export class EventManager<
-  TPayload = unknown,
-  TData = unknown,
-  TReason = unknown
-> {
+export class EventManager<TPayload = unknown, TData = unknown, TReason = unknown> {
   readonly #eventListeners: Map<
     EventType,
     Set<EventListener<EventType, TPayload, TData, TReason>>
@@ -163,9 +138,7 @@ export class EventManager<
     }
   }
 
-  dispatchEvent<T extends EventType>(
-    event: EventByType<T, TPayload, TData, TReason>
-  ) {
+  dispatchEvent<T extends EventType>(event: EventByType<T, TPayload, TData, TReason>) {
     const listeners = this.#eventListeners.get(event.type);
     if (!listeners) {
       return;

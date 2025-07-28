@@ -1,4 +1,4 @@
-import { type Event, EventManager, type EventType } from "./event-manager";
+import { type Event, EventManager, type EventType } from './event-manager';
 
 export type Id = number;
 
@@ -16,46 +16,42 @@ export interface SafeRejectedResult<TReason = unknown> {
   reason: TReason;
 }
 
-export type PromiseEntry<
-  TPayload = unknown,
-  TData = unknown,
-  TReason = unknown
-> =
-  | PromiseEntryUnsafe<TPayload, TData, TReason>
-  | PromiseEntrySafe<TPayload, TData, TReason>;
+export type CallStack<TPayload = unknown, TData = unknown, TReason = unknown> =
+  | CallStackUnsafe<TPayload, TData, TReason>
+  | CallStackSafe<TPayload, TData, TReason>;
 
-export interface PromiseEntryBase<
-  TPayload = unknown,
-  TData = unknown,
-  TReason = unknown
-> {
+export interface CallStackBase<TPayload = unknown, TData = unknown, TReason = unknown> {
   id: Id;
   payload: TPayload;
   resolve: (data?: TData) => void;
   reject: (reason?: TReason) => void;
+  pending: boolean;
 }
 
-export interface PromiseEntryUnsafe<
-  TPayload = unknown,
-  TData = unknown,
-  TReason = unknown
-> extends PromiseEntryBase<TPayload, TData, TReason> {
+export interface CallStackUnsafe<TPayload = unknown, TData = unknown, TReason = unknown>
+  extends CallStackBase<TPayload, TData, TReason> {
   promise: Promise<TData>;
   safe: false;
 }
 
-export interface PromiseEntrySafe<
-  TPayload = unknown,
-  TData = unknown,
-  TReason = unknown
-> extends PromiseEntryBase<TPayload, TData, TReason> {
+export interface CallStackSafe<TPayload = unknown, TData = unknown, TReason = unknown>
+  extends CallStackBase<TPayload, TData, TReason> {
   promise: Promise<SafeResult<TData, TReason>>;
   safe: true;
 }
 
+export interface CallStoreOptions {
+  unmountingDelay?: number;
+}
+
+export interface CallOptions {
+  unmountingDelay?: number;
+}
+
 export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
-  #stack: Map<Id, PromiseEntry<TPayload, TData, TReason>> = new Map();
-  #snapshot: PromiseEntry<TPayload, TData, TReason>[] | null = null;
+  #stack: Map<Id, CallStack<TPayload, TData, TReason>> = new Map();
+  #snapshot: Array<CallStack<TPayload, TData, TReason>> | null = null;
+  #unmountingDelay: number;
 
   #eventManager: EventManager<TPayload, TData, TReason> = new EventManager<
     TPayload,
@@ -66,13 +62,15 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
 
   #nextId = 0;
 
-  get entries() {
-    return this.memoizeSnapshot(() => Array.from(this.#stack.values()));
+  constructor(options: CallStoreOptions = {}) {
+    this.#unmountingDelay = options?.unmountingDelay ?? 0;
   }
 
-  memoizeSnapshot<T extends PromiseEntry<TPayload, TData, TReason>[]>(
-    snapshotFn: () => T
-  ) {
+  get callStacks() {
+    return this.#memoizeSnapshot(() => Array.from(this.#stack.values()));
+  }
+
+  #memoizeSnapshot<T extends Array<CallStack<TPayload, TData, TReason>>>(snapshotFn: () => T) {
     const currentVersion = this.#getChangeVersion();
 
     if (this.#snapshot && this.#changeVersion === currentVersion) {
@@ -106,20 +104,40 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
     this.#eventManager.dispatchEvent(event);
   }
 
-  #addPromise(
+  #addCallStack(
     payload: TPayload,
-    safe: false
-  ): PromiseEntryUnsafe<TPayload, TData, TReason>;
-  #addPromise(
+    safe: false,
+    options: CallOptions
+  ): CallStackUnsafe<TPayload, TData, TReason>;
+  #addCallStack(
     payload: TPayload,
-    safe: true
-  ): PromiseEntrySafe<TPayload, TData, TReason>;
-  #addPromise(payload: TPayload, safe: boolean) {
-    const {
-      promise,
-      resolve: resolvePromise,
-      reject: rejectPromise,
-    } = Promise.withResolvers();
+    safe: true,
+    options: CallOptions
+  ): CallStackSafe<TPayload, TData, TReason>;
+  #addCallStack(
+    payload: TPayload,
+    safe: boolean,
+    { unmountingDelay = this.#unmountingDelay }: CallOptions
+  ) {
+    const { promise, resolve: resolvePromise, reject: rejectPromise } = Promise.withResolvers();
+
+    const handleSettlement = (type: 'resolve' | 'reject') => {
+      this.#stack.set(callStack.id, {
+        ...callStack,
+        pending: false,
+      });
+
+      this.#dispatchEvent({ type, callStack });
+
+      if (unmountingDelay > 0) {
+        // TODO: do we need to cleanup?
+        setTimeout(() => {
+          this.#deleteCallStack(callStack.id, 'settled');
+        }, unmountingDelay);
+      } else {
+        this.#deleteCallStack(callStack.id, 'settled');
+      }
+    };
 
     const resolve = (data?: TData) => {
       if (safe) {
@@ -127,12 +145,7 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
       } else {
         resolvePromise(data);
       }
-      this.#dispatchEvent({
-        type: "resolve",
-        entry,
-      });
-
-      this.#deletePromise(entry.id, "settled");
+      handleSettlement('resolve');
     };
 
     const reject = (reason?: TReason) => {
@@ -141,39 +154,34 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
       } else {
         rejectPromise(reason);
       }
-      this.#dispatchEvent({
-        type: "reject",
-        entry,
-      });
-
-      this.#deletePromise(entry.id, "settled");
+      handleSettlement('reject');
     };
 
     const id = this.#generateId();
 
-    const entry = {
+    const callStack = {
       id,
       payload,
       promise,
       resolve,
       reject,
-      pending: Boolean(resolvePromise) && Boolean(rejectPromise),
+      pending: true,
       safe,
-    } as PromiseEntry<TPayload, TData, TReason>;
+    } as CallStack<TPayload, TData, TReason>;
 
-    this.#stack.set(entry.id, entry);
+    this.#stack.set(callStack.id, callStack);
 
     this.#dispatchEvent({
-      type: "add",
-      entry,
+      type: 'add',
+      callStack,
     });
 
-    return entry;
+    return callStack;
   }
 
-  #deletePromise(id: Id, eventType: Extract<EventType, "delete" | "settled">) {
-    const entry = this.#stack.get(id);
-    if (!entry) {
+  #deleteCallStack(id: Id, eventType: Extract<EventType, 'delete' | 'settled'>) {
+    const callStack = this.#stack.get(id);
+    if (!callStack) {
       return;
     }
 
@@ -181,69 +189,69 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
 
     this.#dispatchEvent({
       type: eventType,
-      entry,
+      callStack,
     });
 
-    return entry;
+    return callStack;
   }
 
   /**
-   * Adds a pending promise entry to the store, returning the promise directly.
+   * Adds a pending call stack to the store, returning the promise directly.
    */
-  call(payload: TPayload) {
-    return this.#addPromise(payload, false);
+  call(payload: TPayload, options: CallStoreOptions = {}) {
+    return this.#addCallStack(payload, false, options);
   }
 
   /**
-   * Adds a safe pending promise entry to the store, returning the promise directly.
+   * Adds a safe pending call stack to the store, returning the promise directly.
    */
-  callSafe(payload: TPayload) {
-    return this.#addPromise(payload, true);
+  callSafe(payload: TPayload, options: CallStoreOptions = {}) {
+    return this.#addCallStack(payload, true, options);
   }
 
   /**
-   * Gets a promise entry from the store.
+   * Gets a call stack from the store.
    */
   get(id: Id) {
     return this.#stack.get(id);
   }
 
   /**
-   * Gets all promise entries from the store.
+   * Gets all call stacks from the store.
    */
   getAll() {
-    return this.entries;
+    return this.callStacks;
   }
 
   /**
-   * Updates a promise entry in the store.
+   * Updates a call stack in the store.
    */
   update(id: Id, payload: TPayload) {
-    const entry = this.#stack.get(id);
-    if (!entry) {
+    const callStack = this.#stack.get(id);
+    if (!callStack) {
       return;
     }
 
-    const newEntry = {
-      ...entry,
+    const newCallStack = {
+      ...callStack,
       payload,
-    } as PromiseEntry<TPayload, TData, TReason>;
+    } as CallStack<TPayload, TData, TReason>;
 
-    this.#stack.set(id, newEntry);
+    this.#stack.set(id, newCallStack);
 
     this.#dispatchEvent({
-      type: "update",
-      entry: newEntry,
+      type: 'update',
+      callStack: newCallStack,
     });
 
-    return entry;
+    return callStack;
   }
 
   /**
-   * Deletes a promise entry from the store.
+   * Deletes a call stack from the store.
    */
   delete(id: Id) {
-    return this.#deletePromise(id, "delete");
+    return this.#deleteCallStack(id, 'delete');
   }
 
   /**
@@ -255,8 +263,8 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
     this.#stack.clear();
 
     this.#dispatchEvent({
-      type: "clear",
-      entries: deleted,
+      type: 'clear',
+      callStacks: deleted,
     });
   }
 
@@ -264,9 +272,7 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
    * Adds an event listener to the store.
    */
   addEventListener(
-    ...args: Parameters<
-      EventManager<TPayload, TData, TReason>["addEventListener"]
-    >
+    ...args: Parameters<EventManager<TPayload, TData, TReason>['addEventListener']>
   ) {
     this.#eventManager.addEventListener(...args);
   }
@@ -275,9 +281,7 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
    * Removes an event listener from the store.
    */
   removeEventListener(
-    ...args: Parameters<
-      EventManager<TPayload, TData, TReason>["removeEventListener"]
-    >
+    ...args: Parameters<EventManager<TPayload, TData, TReason>['removeEventListener']>
   ) {
     this.#eventManager.removeEventListener(...args);
   }

@@ -1,24 +1,26 @@
-import { describe, expectTypeOf, it } from "vitest";
+import { describe, expectTypeOf, it } from 'vitest';
+
 import {
   CallStore,
-  type PromiseEntrySafe,
-  type PromiseEntryUnsafe,
-} from "./call-store";
+  type CallOptions,
+  type CallStackSafe,
+  type CallStackUnsafe,
+} from './call-store';
 
-describe("CallStore", () => {
-  it("should infer correct types for add", () => {
+describe('CallStore', () => {
+  it('should infer correct types for call', () => {
     const store = new CallStore<string, number, string>();
 
     expectTypeOf(store.call).toEqualTypeOf<
-      (payload: string) => PromiseEntryUnsafe<string, number, string>
+      (payload: string, options?: CallOptions) => CallStackUnsafe<string, number, string>
     >();
   });
 
-  it("should infer correct types for addSafe", () => {
+  it('should infer correct types for callSafe', () => {
     const store = new CallStore<string, number, string>();
 
     expectTypeOf(store.callSafe).toEqualTypeOf<
-      (payload: string) => PromiseEntrySafe<string, number, string>
+      (payload: string, options?: CallOptions) => CallStackSafe<string, number, string>
     >();
   });
 });
