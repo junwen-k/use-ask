@@ -59,6 +59,7 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
     TReason
   >();
   #changeVersion = 0;
+  #timeoutIds: Map<Id, ReturnType<typeof setTimeout>> = new Map();
 
   #nextId = 0;
 
@@ -130,10 +131,12 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
       this.#dispatchEvent({ type, callStack });
 
       if (unmountingDelay > 0) {
-        // TODO: do we need to cleanup?
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
+          this.#timeoutIds.delete(callStack.id);
           this.#deleteCallStack(callStack.id, 'settled');
         }, unmountingDelay);
+
+        this.#timeoutIds.set(callStack.id, timeoutId);
       } else {
         this.#deleteCallStack(callStack.id, 'settled');
       }
@@ -183,6 +186,12 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
     const callStack = this.#stack.get(id);
     if (!callStack) {
       return;
+    }
+
+    const timeoutId = this.#timeoutIds.get(id);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      this.#timeoutIds.delete(id);
     }
 
     this.#stack.delete(id);
@@ -258,6 +267,11 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
    * Clears all promise stack from the store.
    */
   clear() {
+    for (const timeoutId of this.#timeoutIds.values()) {
+      clearTimeout(timeoutId);
+    }
+    this.#timeoutIds.clear();
+
     const deleted = Array.from(this.#stack.values());
 
     this.#stack.clear();
