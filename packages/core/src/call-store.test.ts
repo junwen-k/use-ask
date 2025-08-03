@@ -2,9 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { CallStore } from './call-store';
 
-// We polyfill `Promise.withResolvers` because it is not available in Node environment.
-import '@ungap/with-resolvers';
-
 let store: CallStore;
 
 beforeEach(() => {

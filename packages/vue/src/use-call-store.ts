@@ -7,7 +7,7 @@ export function useCallStore<TPayload = unknown, TData = unknown, TReason = unkn
   const callStacks = shallowRef(store.callStacks);
 
   const listener = () => {
-    callStacks.value = store.callStacks;
+    callStacks.value = [...store.callStacks];
   };
 
   store.addEventListener('add', listener);
