@@ -1,0 +1,45 @@
+{
+  "name": "@ui-call/solid",
+  "description": "Solid UI call store for managing async, stackable user interactions.",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "turbo watch build",
+    "build": "tsup",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@ui-call/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@solidjs/testing-library": "^0.8.10",
+    "@testing-library/jest-dom": "^6.6.4",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "catalog:",
+    "@ungap/with-resolvers": "catalog:",
+    "@use-ask/typescript-config": "workspace:*",
+    "@vitest/coverage-v8": "catalog:",
+    "happy-dom": "^18.0.1",
+    "jsdom": "^26.1.0",
+    "tsup": "catalog:",
+    "vite-plugin-solid": "^2.11.8",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.9.7"
+  }
+}
