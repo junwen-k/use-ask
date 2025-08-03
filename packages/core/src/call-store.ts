@@ -58,7 +58,7 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
     TData,
     TReason
   >();
-  #changeVersion = 0;
+  #snapshotVersion = 0;
   #timeoutIds: Map<Id, ReturnType<typeof setTimeout>> = new Map();
 
   #nextId = 0;
@@ -72,9 +72,9 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
   }
 
   #memoizeSnapshot<T extends Array<CallStack<TPayload, TData, TReason>>>(snapshotFn: () => T) {
-    const currentVersion = this.#getChangeVersion();
+    const currentVersion = this.#getSnapshotVersion();
 
-    if (this.#snapshot && this.#changeVersion === currentVersion) {
+    if (this.#snapshot && this.#snapshotVersion === currentVersion) {
       return this.#snapshot;
     }
 
@@ -85,8 +85,8 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
     return result;
   }
 
-  #getChangeVersion() {
-    return this.#changeVersion;
+  #getSnapshotVersion() {
+    return this.#snapshotVersion;
   }
 
   #generateId() {
@@ -97,7 +97,7 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
 
   #invalidateSnapshot() {
     this.#snapshot = null;
-    this.#changeVersion++;
+    this.#snapshotVersion++;
   }
 
   #dispatchEvent(event: Event<TPayload, TData, TReason>) {
@@ -132,7 +132,6 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
 
       if (unmountingDelay > 0) {
         const timeoutId = setTimeout(() => {
-          this.#timeoutIds.delete(callStack.id);
           this.#deleteCallStack(callStack.id, 'settled');
         }, unmountingDelay);
 
