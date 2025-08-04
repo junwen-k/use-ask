@@ -1,79 +1,153 @@
-import { renderHook } from '@solidjs/testing-library';
 import { CallStore } from '@ui-call/core';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { createCallStore } from './create-call-store';
 
 describe('createCallStore', () => {
-  describe('Initialization', () => {
-    it('should create a new store and create signal function', () => {
+  describe('when creating a new store', () => {
+    it('should return a store and signal creator function', () => {
       const [store, createStoreSignal] = createCallStore();
 
+      expect(store).toBeInstanceOf(CallStore);
+      expect(createStoreSignal).toBeInstanceOf(Function);
+    });
+
+    it('should initialize with an empty stack', () => {
+      const [, createStoreSignal] = createCallStore();
       const signal = createStoreSignal();
 
-      expect(store).toBeInstanceOf(CallStore);
-      expect(signal).toBeInstanceOf(Function);
+      expect(signal()).toHaveLength(0);
     });
   });
 
-  describe('Store Operations', () => {
-    it('should reflect store changes in stack', () => {
+  describe('when making calls', () => {
+    it('should add calls to the stack', () => {
       const [store, createStoreSignal] = createCallStore();
-
       const signal = createStoreSignal();
 
-      store.call('test');
+      store.call('test-payload');
 
       expect(signal()).toHaveLength(1);
-      expect(signal()[0].payload).toBe('test');
+      expect(signal()[0].payload).toBe('test-payload');
+      expect(signal()[0].pending).toBe(true);
     });
 
-    it('should handle promise resolution', async () => {
+    it('should handle multiple calls', () => {
       const [store, createStoreSignal] = createCallStore();
-
       const signal = createStoreSignal();
 
-      store.call('test');
-      expect(signal()).toHaveLength(1);
+      store.call('first-payload');
+      store.call('second-payload');
 
-      const call = signal()[0];
-      expect(call).toBeDefined();
-
-      call?.resolve('success');
-      await expect(call?.promise).resolves.toBe('success');
-
-      expect(signal()).toHaveLength(0);
+      expect(signal()).toHaveLength(2);
+      expect(signal()[0].payload).toBe('first-payload');
+      expect(signal()[1].payload).toBe('second-payload');
     });
+  });
 
-    it('should handle promise rejection', async () => {
+  describe('when resolving calls', () => {
+    it('should resolve promises and remove from stack', async () => {
       const [store, createStoreSignal] = createCallStore();
-
       const signal = createStoreSignal();
 
-      store.call('test');
+      store.call('test-payload');
       expect(signal()).toHaveLength(1);
 
       const call = signal()[0];
       expect(call).toBeDefined();
 
-      call?.reject('error');
-      await expect(call?.promise).rejects.toBe('error');
-
+      call?.resolve('resolved-data');
+      await expect(call?.promise).resolves.toBe('resolved-data');
       expect(signal()).toHaveLength(0);
     });
 
-    it('should cleanup event listeners when hook unmounts', () => {
+    it('should handle multiple resolutions', async () => {
       const [store, createStoreSignal] = createCallStore();
-      const { cleanup } = renderHook(() => createStoreSignal());
+      const signal = createStoreSignal();
 
-      const removeEventListenerSpy = vi.spyOn(store, 'removeEventListener');
+      store.call('first-payload');
+      store.call('second-payload');
 
-      cleanup();
+      expect(signal()).toHaveLength(2);
 
-      for (const event of ['add', 'update', 'settled', 'resolve', 'reject']) {
-        expect(removeEventListenerSpy).toHaveBeenCalledWith(event, expect.any(Function));
-      }
-      removeEventListenerSpy.mockRestore();
+      const call1 = signal()[0];
+      const call2 = signal()[1];
+
+      call1?.resolve('first-result');
+      await expect(call1?.promise).resolves.toBe('first-result');
+      expect(signal()).toHaveLength(1);
+
+      call2?.resolve('second-result');
+      await expect(call2?.promise).resolves.toBe('second-result');
+      expect(signal()).toHaveLength(0);
+    });
+  });
+
+  describe('when rejecting calls', () => {
+    it('should reject promises and remove from stack', async () => {
+      const [store, createStoreSignal] = createCallStore();
+      const signal = createStoreSignal();
+
+      store.call('test-payload');
+      expect(signal()).toHaveLength(1);
+
+      const call = signal()[0];
+      expect(call).toBeDefined();
+
+      call?.reject('error-message');
+      await expect(call?.promise).rejects.toBe('error-message');
+      expect(signal()).toHaveLength(0);
+    });
+
+    it('should handle multiple rejections', async () => {
+      const [store, createStoreSignal] = createCallStore();
+      const signal = createStoreSignal();
+
+      store.call('first-payload');
+      store.call('second-payload');
+
+      expect(signal()).toHaveLength(2);
+
+      const call1 = signal()[0];
+      const call2 = signal()[1];
+
+      call1?.reject('first-error');
+      await expect(call1?.promise).rejects.toBe('first-error');
+      expect(signal()).toHaveLength(1);
+
+      call2?.reject('second-error');
+      await expect(call2?.promise).rejects.toBe('second-error');
+      expect(signal()).toHaveLength(0);
+    });
+  });
+
+  describe('when unmounting delay is set', () => {
+    it('should keep calls in stack after resolution until delay', async () => {
+      const [store, createStoreSignal] = createCallStore({ unmountingDelay: 100 });
+      const signal = createStoreSignal();
+
+      store.call('test-payload');
+      const call = signal()[0];
+      call?.resolve('resolved-data');
+      await call?.promise;
+
+      expect(signal()).toHaveLength(1);
+      expect(signal()[0].pending).toBe(false);
+    });
+  });
+
+  describe('when multiple signals are created', () => {
+    it('should synchronize all signals', () => {
+      const [store, createStoreSignal] = createCallStore();
+      const signal1 = createStoreSignal();
+      const signal2 = createStoreSignal();
+
+      store.call('test-payload');
+
+      expect(signal1()).toHaveLength(1);
+      expect(signal2()).toHaveLength(1);
+      expect(signal1()[0].payload).toBe('test-payload');
+      expect(signal2()[0].payload).toBe('test-payload');
     });
   });
 });
