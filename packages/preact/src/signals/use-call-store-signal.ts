@@ -16,8 +16,6 @@ export function useCallStoreSignal<TPayload = unknown, TData = unknown, TReason 
     store.addEventListener('settled', listener);
     store.addEventListener('resolve', listener);
     store.addEventListener('reject', listener);
-    store.addEventListener('delete', listener);
-    store.addEventListener('clear', listener);
 
     return () => {
       store.removeEventListener('add', listener);
@@ -25,8 +23,6 @@ export function useCallStoreSignal<TPayload = unknown, TData = unknown, TReason 
       store.removeEventListener('settled', listener);
       store.removeEventListener('resolve', listener);
       store.removeEventListener('reject', listener);
-      store.removeEventListener('delete', listener);
-      store.removeEventListener('clear', listener);
     };
   });
 

@@ -8,7 +8,7 @@ export class CallStore<
 > extends CoreCallStore<TPayload, TData, TReason> {
   #subscribe: () => void;
 
-  constructor(...args: ConstructorParameters<typeof CoreCallStore>) {
+  constructor(...args: ConstructorParameters<typeof CoreCallStore<TPayload, TData, TReason>>) {
     super(...args);
 
     this.#subscribe = createSubscriber((update) => {
@@ -19,8 +19,6 @@ export class CallStore<
       this.addEventListener('settled', listener);
       this.addEventListener('resolve', listener);
       this.addEventListener('reject', listener);
-      this.addEventListener('delete', listener);
-      this.addEventListener('clear', listener);
 
       return () => {
         this.removeEventListener('add', listener);
@@ -28,8 +26,6 @@ export class CallStore<
         this.removeEventListener('settled', listener);
         this.removeEventListener('resolve', listener);
         this.removeEventListener('reject', listener);
-        this.removeEventListener('delete', listener);
-        this.removeEventListener('clear', listener);
       };
     });
   }

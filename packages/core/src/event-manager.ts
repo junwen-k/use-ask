@@ -8,9 +8,7 @@ export type EventType =
   | ResolveEvent['type']
   | RejectEvent['type']
   | UpdateEvent['type']
-  | DeleteEvent['type']
-  | SettledEvent['type']
-  | ClearEvent['type'];
+  | SettledEvent['type'];
 
 /**
  * Maps an event type string to its respective event interface.
@@ -23,13 +21,9 @@ type EventByType<T, TPayload, TData, TReason> = T extends 'add'
       ? RejectEvent<TPayload, TData, TReason>
       : T extends 'update'
         ? UpdateEvent<TPayload, TData, TReason>
-        : T extends 'delete'
-          ? DeleteEvent<TPayload, TData, TReason>
-          : T extends 'settled'
-            ? SettledEvent<TPayload, TData, TReason>
-            : T extends 'clear'
-              ? ClearEvent<TPayload, TData, TReason>
-              : never;
+        : T extends 'settled'
+          ? SettledEvent<TPayload, TData, TReason>
+          : never;
 
 /**
  * Base interface for all events.
@@ -67,18 +61,6 @@ export interface SettledEvent<TPayload = unknown, TData = unknown, TReason = unk
   callStack: CallStack<TPayload, TData, TReason>;
 }
 
-export interface DeleteEvent<TPayload = unknown, TData = unknown, TReason = unknown>
-  extends BaseEvent {
-  type: 'delete';
-  callStack: CallStack<TPayload, TData, TReason>;
-}
-
-export interface ClearEvent<TPayload = unknown, TData = unknown, TReason = unknown>
-  extends BaseEvent {
-  type: 'clear';
-  callStacks: Array<CallStack<TPayload, TData, TReason>>;
-}
-
 /**
  * Type representing all possible event types.
  */
@@ -87,9 +69,7 @@ export type Event<TPayload = unknown, TData = unknown, TReason = unknown> =
   | ResolveEvent<TPayload, TData, TReason>
   | RejectEvent<TPayload, TData, TReason>
   | UpdateEvent<TPayload, TData, TReason>
-  | DeleteEvent<TPayload, TData, TReason>
-  | SettledEvent<TPayload, TData, TReason>
-  | ClearEvent<TPayload, TData, TReason>;
+  | SettledEvent<TPayload, TData, TReason>;
 
 export type EventListener<T extends EventType, TPayload, TData, TReason> = (
   event: EventByType<T, TPayload, TData, TReason>

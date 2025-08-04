@@ -15,8 +15,6 @@ export function useCallStore<TPayload = unknown, TData = unknown, TReason = unkn
   store.addEventListener('settled', listener);
   store.addEventListener('resolve', listener);
   store.addEventListener('reject', listener);
-  store.addEventListener('delete', listener);
-  store.addEventListener('clear', listener);
 
   onBeforeUnmount(() => {
     store.removeEventListener('add', listener);
@@ -24,8 +22,6 @@ export function useCallStore<TPayload = unknown, TData = unknown, TReason = unkn
     store.removeEventListener('settled', listener);
     store.removeEventListener('resolve', listener);
     store.removeEventListener('reject', listener);
-    store.removeEventListener('delete', listener);
-    store.removeEventListener('clear', listener);
   });
 
   return readonly(callStacks);

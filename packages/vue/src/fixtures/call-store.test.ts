@@ -29,12 +29,12 @@ describe('CallStore', () => {
         },
       });
 
-      const callStack = store.call('test');
+      const promise = store.call('test');
 
       await expect.element(screen.getByTestId('payload')).toHaveTextContent('test');
 
-      callStack?.resolve('success');
-      await expect(callStack?.promise).resolves.toBe('success');
+      store.resolve(promise, 'success');
+      expect(promise).resolves.toBe('success');
 
       await expect.element(screen.getByTestId('callStack')).not.toBeInTheDocument();
     });
@@ -48,11 +48,12 @@ describe('CallStore', () => {
         },
       });
 
-      const callStack = store.call('test');
+      const promise = store.call('test');
 
       await expect.element(screen.getByTestId('payload')).toHaveTextContent('test');
 
-      callStack?.reject();
+      store.reject(promise, 'error');
+      expect(promise).rejects.toThrow('error');
 
       await expect.element(screen.getByTestId('callStack')).not.toBeInTheDocument();
     });
@@ -66,12 +67,12 @@ describe('CallStore', () => {
         },
       });
 
-      const callStack = store.callSafe('test');
+      const promise = store.callSafe('test');
 
       await expect.element(screen.getByTestId('payload')).toHaveTextContent('test');
 
-      callStack?.resolve('success');
-      await expect(callStack?.promise).resolves.toEqual({
+      store.resolve(promise, 'success');
+      await expect(promise).resolves.toEqual({
         ok: true,
         data: 'success',
       });
@@ -88,36 +89,17 @@ describe('CallStore', () => {
         },
       });
 
-      const callStack = store.callSafe('test');
+      const promise = store.callSafe('test');
 
       await expect.element(screen.getByTestId('payload')).toHaveTextContent('test');
 
-      callStack?.reject();
-      await expect(callStack?.promise).resolves.toEqual({
+      store.reject(promise);
+      await expect(promise).resolves.toEqual({
         ok: false,
         reason: undefined,
       });
 
       await expect.element(screen.getByTestId('callStack')).not.toBeInTheDocument();
-    });
-
-    it('should update call stacks when store is cleared', async () => {
-      const [store] = createCallStore();
-
-      const screen = render(Component, {
-        props: {
-          store,
-        },
-      });
-
-      store.call('test');
-      store.call('test');
-
-      await expect.poll(() => screen.getByTestId('callStack').elements().length).toBe(2);
-
-      store.clear();
-
-      await expect.poll(() => screen.getByTestId('callStack').elements().length).toBe(0);
     });
   });
 });

@@ -23,7 +23,6 @@ describe('createCallStore', () => {
       act(() => {
         store.call('test');
       });
-
       expect(result.current).toHaveLength(1);
       expect(result.current[0].payload).toBe('test');
     });
@@ -33,10 +32,12 @@ describe('createCallStore', () => {
 
       const { result } = renderHook(() => useCallStore());
 
-      act(() => store.call('test'));
+      act(() => {
+        store.call('test');
+      });
       expect(result.current).toHaveLength(1);
 
-      const callStack = store.get(result.current[0].id);
+      const callStack = result.current[0];
       expect(callStack).toBeDefined();
 
       await act(async () => {
@@ -52,10 +53,12 @@ describe('createCallStore', () => {
 
       const { result } = renderHook(() => useCallStore());
 
-      act(() => store.call('test'));
+      act(() => {
+        store.call('test');
+      });
       expect(result.current).toHaveLength(1);
 
-      const callStack = store.get(result.current[0].id);
+      const callStack = result.current[0];
       expect(callStack).toBeDefined();
 
       await act(async () => {
@@ -71,10 +74,12 @@ describe('createCallStore', () => {
 
       const { result } = renderHook(() => useCallStore());
 
-      act(() => store.callSafe('test'));
+      act(() => {
+        store.callSafe('test');
+      });
       expect(result.current).toHaveLength(1);
 
-      const callStack = store.get(result.current[0].id);
+      const callStack = result.current[0];
       expect(callStack).toBeDefined();
 
       await act(async () => {
@@ -93,10 +98,12 @@ describe('createCallStore', () => {
 
       const { result } = renderHook(() => useCallStore());
 
-      act(() => store.callSafe('test'));
+      act(() => {
+        store.callSafe('test');
+      });
       expect(result.current).toHaveLength(1);
 
-      const callStack = store.get(result.current[0].id);
+      const callStack = result.current[0];
       expect(callStack).toBeDefined();
 
       await act(async () => {
@@ -108,21 +115,6 @@ describe('createCallStore', () => {
       });
     });
 
-    it('should update call stacks when store is cleared', () => {
-      const [store, useCallStore] = createCallStore();
-
-      const { result } = renderHook(() => useCallStore());
-
-      act(() => {
-        store.call('test1');
-        store.call('test2');
-      });
-      expect(result.current).toHaveLength(2);
-
-      act(() => store.clear());
-      expect(result.current).toHaveLength(0);
-    });
-
     it('should cleanup event listeners when hook unmounts', () => {
       const [store, useCallStore] = createCallStore();
       const { unmount } = renderHook(() => useCallStore());
@@ -131,7 +123,7 @@ describe('createCallStore', () => {
 
       unmount();
 
-      for (const event of ['add', 'update', 'settled', 'resolve', 'reject', 'delete', 'clear']) {
+      for (const event of ['add', 'update', 'settled', 'resolve', 'reject']) {
         expect(removeEventListenerSpy).toHaveBeenCalledWith(event, expect.any(Function));
       }
       removeEventListenerSpy.mockRestore();

@@ -36,7 +36,7 @@ describe('createCallStore', () => {
       store.call('test');
       expect(signal()).toHaveLength(1);
 
-      const callStack = store.get(signal()[0].id);
+      const callStack = signal()[0];
       expect(callStack).toBeDefined();
 
       callStack?.resolve('success');
@@ -53,7 +53,7 @@ describe('createCallStore', () => {
       store.call('test');
       expect(signal()).toHaveLength(1);
 
-      const callStack = store.get(signal()[0].id);
+      const callStack = signal()[0];
       expect(callStack).toBeDefined();
 
       callStack?.reject('error');
@@ -70,7 +70,7 @@ describe('createCallStore', () => {
       store.callSafe('test');
       expect(signal()).toHaveLength(1);
 
-      const callStack = store.get(signal()[0].id);
+      const callStack = signal()[0];
       expect(callStack).toBeDefined();
 
       callStack?.resolve('success');
@@ -90,7 +90,7 @@ describe('createCallStore', () => {
       store.callSafe('test');
       expect(signal()).toHaveLength(1);
 
-      const callStack = store.get(signal()[0].id);
+      const callStack = signal()[0];
       expect(callStack).toBeDefined();
 
       callStack?.reject();
@@ -98,19 +98,6 @@ describe('createCallStore', () => {
         ok: false,
         reason: undefined,
       });
-    });
-
-    it('should update call stacks when store is cleared', () => {
-      const [store, createStoreSignal] = createCallStore();
-
-      const signal = createStoreSignal();
-
-      store.call('test1');
-      store.call('test2');
-      expect(signal()).toHaveLength(2);
-
-      store.clear();
-      expect(signal()).toHaveLength(0);
     });
 
     it('should cleanup event listeners when hook unmounts', () => {
@@ -121,7 +108,7 @@ describe('createCallStore', () => {
 
       cleanup();
 
-      for (const event of ['add', 'update', 'settled', 'resolve', 'reject', 'delete', 'clear']) {
+      for (const event of ['add', 'update', 'settled', 'resolve', 'reject']) {
         expect(removeEventListenerSpy).toHaveBeenCalledWith(event, expect.any(Function));
       }
       removeEventListenerSpy.mockRestore();

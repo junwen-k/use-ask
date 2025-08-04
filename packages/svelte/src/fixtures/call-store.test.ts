@@ -25,11 +25,11 @@ describe('CallStore', () => {
         store,
       });
 
-      const callStack = store.call('test');
+      const promise = store.call('test');
 
       await screen.getByTestId('resolve').click();
 
-      await expect(callStack.promise).resolves.toBe(true);
+      await expect(promise).resolves.toBe(true);
     });
 
     it('should handle promise rejection', async () => {
@@ -39,11 +39,11 @@ describe('CallStore', () => {
         store,
       });
 
-      const callStack = store.call('test');
+      const promise = store.call('test');
 
       await screen.getByTestId('reject').click();
 
-      await expect(callStack.promise).rejects.toThrow();
+      await expect(promise).rejects.toThrow();
     });
 
     it('should handle safe promise resolution', async () => {
@@ -53,11 +53,11 @@ describe('CallStore', () => {
         store,
       });
 
-      const callStack = store.callSafe('test');
+      const promise = store.callSafe('test');
 
       await screen.getByTestId('resolve').click();
 
-      await expect(callStack.promise).resolves.toEqual({
+      await expect(promise).resolves.toEqual({
         ok: true,
         data: true,
       });
@@ -70,31 +70,14 @@ describe('CallStore', () => {
         store,
       });
 
-      const callStack = store.callSafe('test');
+      const promise = store.callSafe('test');
 
       await screen.getByTestId('reject').click();
 
-      await expect(callStack.promise).resolves.toEqual({
+      await expect(promise).resolves.toEqual({
         ok: false,
         reason: undefined,
       });
-    });
-
-    it('should update call stacks when store is cleared', async () => {
-      const store = new CallStore();
-
-      const screen = render(Component, {
-        store,
-      });
-
-      store.call('test1');
-      store.call('test2');
-
-      await expect.poll(() => screen.getByTestId('callStack').elements().length).toBe(2);
-
-      store.clear();
-
-      await expect.poll(() => screen.getByTestId('callStack').elements().length).toBe(0);
     });
 
     it('should cleanup event listeners when component unmounts', () => {
@@ -108,7 +91,7 @@ describe('CallStore', () => {
 
       screen.unmount();
 
-      for (const event of ['add', 'update', 'settled', 'resolve', 'reject', 'delete', 'clear']) {
+      for (const event of ['add', 'update', 'settled', 'resolve', 'reject']) {
         expect(removeEventListenerSpy).toHaveBeenCalledWith(event, expect.any(Function));
       }
       removeEventListenerSpy.mockRestore();
