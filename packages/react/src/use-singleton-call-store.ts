@@ -1,10 +1,10 @@
-import type { CallStore } from '@ui-call/core';
+import type { SingletonCallStore } from '@ui-call/core';
 import { useSyncExternalStore } from 'react';
 
 const EVENTS = ['add', 'update', 'settled', 'resolve', 'reject'] as const;
 
-export function useCallStore<TPayload = unknown, TData = unknown, TReason = unknown>(
-  store: CallStore<TPayload, TData, TReason>
+export function useSingletonCallStore<TPayload = unknown, TData = unknown, TReason = unknown>(
+  store: SingletonCallStore<TPayload, TData, TReason>
 ) {
   return useSyncExternalStore(
     (listener) => {
@@ -17,7 +17,7 @@ export function useCallStore<TPayload = unknown, TData = unknown, TReason = unkn
         });
       };
     },
-    () => store.stack,
-    () => store.stack
+    () => store.current,
+    () => store.current
   );
 }
