@@ -34,7 +34,7 @@ describe('CallStore', () => {
       await expect.element(screen.getByTestId('payload')).toHaveTextContent('test');
 
       store.resolve(promise, 'success');
-      expect(promise).resolves.toBe('success');
+      await expect(promise).resolves.toBe('success');
 
       await expect.element(screen.getByTestId('callStack')).not.toBeInTheDocument();
     });
@@ -53,7 +53,7 @@ describe('CallStore', () => {
       await expect.element(screen.getByTestId('payload')).toHaveTextContent('test');
 
       store.reject(promise, 'error');
-      expect(promise).rejects.toThrow('error');
+      await expect(promise).rejects.toThrow('error');
 
       await expect.element(screen.getByTestId('callStack')).not.toBeInTheDocument();
     });
