@@ -6,6 +6,18 @@ export class SingletonCallStore<TPayload = unknown, TData = unknown, TReason = u
 
   constructor(...args: ConstructorParameters<typeof CallStore<TPayload, TData, TReason>>) {
     this.#callStore = new CallStore<TPayload, TData, TReason>(...args);
+
+    this.#callStore.addEventListener('resolve', (event) => {
+      if (event.call.promise === this.#current) {
+        this.#current = null;
+      }
+    });
+
+    this.#callStore.addEventListener('reject', (event) => {
+      if (event.call.promise === this.#current) {
+        this.#current = null;
+      }
+    });
   }
 
   get current() {
