@@ -16,7 +16,7 @@ describe('CallStore', () => {
   });
 
   describe('Create', () => {
-    it('should be able to add a call stack and resolve it', async () => {
+    it('should be able to add a call and resolve it', async () => {
       const promise = store.call('payload');
 
       expect(promise).toBeDefined();
@@ -30,37 +30,12 @@ describe('CallStore', () => {
       await expect(promise).resolves.toBe('value');
     });
 
-    it('should be able to add a safe call stack and resolve it', async () => {
-      const promise = store.callSafe('payload');
-
-      expect(promise).toBeDefined();
-      expect(promise).toBeInstanceOf(Promise);
-
-      expect(store.stack).toHaveLength(1);
-      expect(store.stack[0].promise).toBe(promise);
-
-      store.resolve(promise, 'value');
-
-      await expect(promise).resolves.toEqual({ ok: true, data: 'value' });
-    });
-
-    it('should be able to add a call stack and reject it', async () => {
+    it('should be able to add a call and reject it', async () => {
       const promise = store.call('payload');
 
       store.reject(promise, 'reason');
 
       await expect(promise).rejects.toThrow('reason');
-    });
-
-    it('should be able to add a safe call stack and reject without throwing', async () => {
-      const promise = store.callSafe('payload');
-
-      store.reject(promise, 'reason');
-
-      await expect(promise).resolves.toEqual({
-        ok: false,
-        reason: 'reason',
-      });
     });
 
     it('should be able to reject with an error', async () => {

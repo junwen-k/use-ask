@@ -1,41 +1,12 @@
 import { type Event, EventManager, type EventType } from './event-manager';
 
-export type SafeResult<TData = unknown, TReason = unknown> =
-  | SafeFullfilledResult<TData>
-  | SafeRejectedResult<TReason>;
-
-export interface SafeFullfilledResult<TData = unknown> {
-  ok: true;
-  data: TData;
-}
-
-export interface SafeRejectedResult<TReason = unknown> {
-  ok: false;
-  reason: TReason;
-}
-
-export type Call<TPayload = unknown, TData = unknown, TReason = unknown> =
-  | CallUnsafe<TPayload, TData, TReason>
-  | CallSafe<TPayload, TData, TReason>;
-
-export interface CallBase<TPayload = unknown, TData = unknown, TReason = unknown> {
+export interface Call<TPayload = unknown, TData = unknown, TReason = unknown> {
   id: number;
   payload: TPayload;
   resolve: (data?: TData) => void;
   reject: (reason?: TReason) => void;
-  pending: boolean;
-}
-
-export interface CallUnsafe<TPayload = unknown, TData = unknown, TReason = unknown>
-  extends CallBase<TPayload, TData, TReason> {
   promise: Promise<TData>;
-  safe: false;
-}
-
-export interface CallSafe<TPayload = unknown, TData = unknown, TReason = unknown>
-  extends CallBase<TPayload, TData, TReason> {
-  promise: Promise<SafeResult<TData, TReason>>;
-  safe: true;
+  pending: boolean;
 }
 
 export interface CallStoreOptions {
@@ -57,7 +28,7 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
 
   #nextId = 0;
   #unmountingDelay: number;
-  #timeoutIds: Map<Promise<unknown>, ReturnType<typeof setTimeout>> = new Map();
+  #timeoutIds: Map<Promise<TData>, ReturnType<typeof setTimeout>> = new Map();
 
   constructor(options: CallStoreOptions = {}) {
     this.#unmountingDelay = options?.unmountingDelay ?? 0;
@@ -77,18 +48,8 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
     this.#eventManager.dispatchEvent(event);
   }
 
-  #addCall(
-    payload: TPayload,
-    safe: false,
-    options: CallOptions
-  ): CallUnsafe<TPayload, TData, TReason>;
-  #addCall(payload: TPayload, safe: true, options: CallOptions): CallSafe<TPayload, TData, TReason>;
-  #addCall(
-    payload: TPayload,
-    safe: boolean,
-    { unmountingDelay = this.#unmountingDelay }: CallOptions
-  ) {
-    const { promise, resolve: resolvePromise, reject: rejectPromise } = Promise.withResolvers();
+  #addCall(payload: TPayload, { unmountingDelay = this.#unmountingDelay }: CallOptions) {
+    const { promise, resolve: _resolve, reject: _reject } = Promise.withResolvers();
 
     const handleSettlement = (type: 'resolve' | 'reject') => {
       const index = this.stack.indexOf(call);
@@ -115,20 +76,12 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
     };
 
     const resolve = (data?: TData) => {
-      if (safe) {
-        resolvePromise({ ok: true, data });
-      } else {
-        resolvePromise(data);
-      }
+      _resolve(data);
       handleSettlement('resolve');
     };
 
     const reject = (reason?: TReason) => {
-      if (safe) {
-        resolvePromise({ ok: false, reason });
-      } else {
-        rejectPromise(reason);
-      }
+      _reject(reason);
       handleSettlement('reject');
     };
 
@@ -141,7 +94,6 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
       resolve,
       reject,
       pending: true,
-      safe,
     } as Call<TPayload, TData, TReason>;
 
     this.stack.push(call);
@@ -154,11 +106,8 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
     return call;
   }
 
-  #deleteCall(promise: Promise<unknown>, eventType: Extract<EventType, 'delete' | 'settled'>) {
-    const call = this.#getCall(promise);
-    if (!call) {
-      return;
-    }
+  #deleteCall(promise: Promise<TData>, eventType: Extract<EventType, 'delete' | 'settled'>) {
+    const call = this.#getCall(promise)!;
 
     const timeoutId = this.#timeoutIds.get(promise);
     if (timeoutId) {
@@ -176,28 +125,15 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
     return call;
   }
 
-  #getCall(promise: Promise<unknown>) {
+  #getCall(promise: Promise<TData>) {
     return this.stack.find((call) => call.promise === promise);
   }
 
-  /**
-   * Adds a pending call stack to the store, returning the promise directly.
-   */
   call(payload: TPayload, options: CallStoreOptions = {}) {
-    return this.#addCall(payload, false, options).promise;
+    return this.#addCall(payload, options).promise;
   }
 
-  /**
-   * Adds a safe pending call stack to the store, returning the promise directly.
-   */
-  callSafe(payload: TPayload, options: CallStoreOptions = {}) {
-    return this.#addCall(payload, true, options).promise;
-  }
-
-  /**
-   * Updates a call stack in the store.
-   */
-  update(promise: Promise<unknown>, payload: TPayload) {
+  update(promise: Promise<TData>, payload: TPayload) {
     const call = this.#getCall(promise);
     if (!call) {
       return;
@@ -217,10 +153,10 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
       call: newCall,
     });
 
-    return call;
+    return call.promise;
   }
 
-  resolve(promise: Promise<unknown>, data?: TData) {
+  resolve(promise: Promise<TData>, data?: TData) {
     const call = this.#getCall(promise);
     if (!call) {
       return;
@@ -229,7 +165,7 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
     call.resolve(data);
   }
 
-  reject(promise: Promise<unknown>, reason?: TReason) {
+  reject(promise: Promise<TData>, reason?: TReason) {
     const call = this.#getCall(promise);
     if (!call) {
       return;
@@ -238,18 +174,12 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
     call.reject(reason);
   }
 
-  /**
-   * Adds an event listener to the store.
-   */
   addEventListener(
     ...args: Parameters<EventManager<TPayload, TData, TReason>['addEventListener']>
   ) {
     this.#eventManager.addEventListener(...args);
   }
 
-  /**
-   * Removes an event listener from the store.
-   */
   removeEventListener(
     ...args: Parameters<EventManager<TPayload, TData, TReason>['removeEventListener']>
   ) {

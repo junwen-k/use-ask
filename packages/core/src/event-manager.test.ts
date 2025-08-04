@@ -19,7 +19,6 @@ describe('EventManager', () => {
       call: {
         id: 1,
         payload: 'test',
-        safe: false,
         promise: new Promise(vi.fn),
         resolve: vi.fn(),
         reject: vi.fn(),
@@ -50,7 +49,6 @@ describe('EventManager', () => {
       call: {
         id: 1,
         payload: 'test',
-        safe: false,
         promise: new Promise(vi.fn),
         resolve: vi.fn(),
         reject: vi.fn(),
@@ -80,7 +78,6 @@ describe('EventManager', () => {
       call: {
         id: 1,
         payload: 'test',
-        safe: false,
         promise: new Promise(vi.fn),
         resolve: vi.fn(),
         reject: vi.fn(),
@@ -108,7 +105,6 @@ describe('EventManager', () => {
       call: {
         id: 1,
         payload: 'test',
-        safe: false,
         promise: new Promise(vi.fn),
         resolve: vi.fn(),
         reject: vi.fn(),
@@ -134,7 +130,6 @@ describe('EventManager', () => {
       call: {
         id: 1,
         payload: 'test',
-        safe: false,
         promise: new Promise(vi.fn),
         resolve: vi.fn(),
         reject: vi.fn(),
@@ -162,7 +157,6 @@ describe('EventManager', () => {
       call: {
         id: 1,
         payload: 'test',
-        safe: false,
         promise: new Promise(vi.fn),
         resolve: vi.fn(),
         reject: vi.fn(),
