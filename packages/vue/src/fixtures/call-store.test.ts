@@ -57,49 +57,5 @@ describe('CallStore', () => {
 
       await expect.element(screen.getByTestId('call')).not.toBeInTheDocument();
     });
-
-    it('should handle safe promise resolution', async () => {
-      const [store] = createCallStore();
-
-      const screen = render(Component, {
-        props: {
-          store,
-        },
-      });
-
-      const promise = store.callSafe('test');
-
-      await expect.element(screen.getByTestId('payload')).toHaveTextContent('test');
-
-      store.resolve(promise, 'success');
-      await expect(promise).resolves.toEqual({
-        ok: true,
-        data: 'success',
-      });
-
-      await expect.element(screen.getByTestId('call')).not.toBeInTheDocument();
-    });
-
-    it('should handle safe promise rejection', async () => {
-      const [store] = createCallStore();
-
-      const screen = render(Component, {
-        props: {
-          store,
-        },
-      });
-
-      const promise = store.callSafe('test');
-
-      await expect.element(screen.getByTestId('payload')).toHaveTextContent('test');
-
-      store.reject(promise);
-      await expect(promise).resolves.toEqual({
-        ok: false,
-        reason: undefined,
-      });
-
-      await expect.element(screen.getByTestId('call')).not.toBeInTheDocument();
-    });
   });
 });

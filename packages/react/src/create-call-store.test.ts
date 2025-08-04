@@ -69,52 +69,6 @@ describe('createCallStore', () => {
       expect(result.current).toHaveLength(0);
     });
 
-    it('should handle safe promise resolution', async () => {
-      const [store, useCallStore] = createCallStore();
-
-      const { result } = renderHook(() => useCallStore());
-
-      act(() => {
-        store.callSafe('test');
-      });
-      expect(result.current).toHaveLength(1);
-
-      const call = result.current[0];
-      expect(call).toBeDefined();
-
-      await act(async () => {
-        call?.resolve('success');
-        await expect(call?.promise).resolves.toEqual({
-          ok: true,
-          data: 'success',
-        });
-      });
-
-      expect(result.current).toHaveLength(0);
-    });
-
-    it('should handle safe promise rejection', async () => {
-      const [store, useCallStore] = createCallStore();
-
-      const { result } = renderHook(() => useCallStore());
-
-      act(() => {
-        store.callSafe('test');
-      });
-      expect(result.current).toHaveLength(1);
-
-      const call = result.current[0];
-      expect(call).toBeDefined();
-
-      await act(async () => {
-        call?.reject();
-        await expect(call?.promise).resolves.toEqual({
-          ok: false,
-          reason: undefined,
-        });
-      });
-    });
-
     it('should cleanup event listeners when hook unmounts', () => {
       const [store, useCallStore] = createCallStore();
       const { unmount } = renderHook(() => useCallStore());

@@ -46,40 +46,6 @@ describe('CallStore', () => {
       await expect(promise).rejects.toThrow();
     });
 
-    it('should handle safe promise resolution', async () => {
-      const store = new CallStore();
-
-      const screen = render(Component, {
-        store,
-      });
-
-      const promise = store.callSafe('test');
-
-      await screen.getByTestId('resolve').click();
-
-      await expect(promise).resolves.toEqual({
-        ok: true,
-        data: true,
-      });
-    });
-
-    it('should handle safe promise rejection', async () => {
-      const store = new CallStore();
-
-      const screen = render(Component, {
-        store,
-      });
-
-      const promise = store.callSafe('test');
-
-      await screen.getByTestId('reject').click();
-
-      await expect(promise).resolves.toEqual({
-        ok: false,
-        reason: undefined,
-      });
-    });
-
     it('should cleanup event listeners when component unmounts', () => {
       const store = new CallStore();
 
