@@ -50,4 +50,45 @@ describe('SingletonCallStore', () => {
       expect(store.current).toBeNull();
     });
   });
+
+  describe('Resolve', () => {
+    it('should resolve the current call', async () => {
+      const promise = store.call('payload');
+      store.resolve('data');
+
+      const result = await promise;
+      expect(result).toBe('data');
+      expect(store.current).toBe(promise);
+    });
+
+    it('should do nothing when no current call exists', () => {
+      expect(() => store.resolve('data')).not.toThrow();
+      expect(store.current).toBeNull();
+    });
+  });
+
+  describe('Reject', () => {
+    it('should reject the current call', async () => {
+      const promise = store.call('payload');
+      store.reject('error');
+
+      await expect(promise).rejects.toBe('error');
+      expect(store.current).toBe(promise);
+    });
+
+    it('should do nothing when no current call exists', () => {
+      expect(() => store.reject('error')).not.toThrow();
+      expect(store.current).toBeNull();
+    });
+  });
+
+  describe('Events', () => {
+    it('should forward event listeners to internal call store', () => {
+      const listener = () => {};
+      expect(() => {
+        store.addEventListener('add', listener);
+        store.removeEventListener('add', listener);
+      }).not.toThrow();
+    });
+  });
 });
