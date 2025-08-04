@@ -11,7 +11,7 @@ describe('SingletonCallStore', () => {
 
   describe('when creating a new store', () => {
     it('should initialize with no current call', () => {
-      expect(store.current).toBeNull();
+      expect(store.current).toBeUndefined();
     });
   });
 
@@ -20,7 +20,9 @@ describe('SingletonCallStore', () => {
       const promise = store.call('first-payload');
 
       expect(promise).toBeInstanceOf(Promise);
-      expect(store.current).toBe(promise);
+      expect(store.current).toBeDefined();
+      expect(store.current?.promise).toBe(promise);
+      expect(store.current?.payload).toBe('first-payload');
     });
   });
 
@@ -30,7 +32,8 @@ describe('SingletonCallStore', () => {
       const promise2 = store.call('second-payload');
 
       expect(promise2).toBe(promise1);
-      expect(store.current).toBe(promise1);
+      expect(store.current?.promise).toBe(promise1);
+      expect(store.current?.payload).toBe('second-payload');
     });
 
     it('should maintain the same promise reference across multiple calls', () => {
@@ -40,7 +43,8 @@ describe('SingletonCallStore', () => {
 
       expect(promise1).toBe(promise2);
       expect(promise2).toBe(promise3);
-      expect(store.current).toBe(promise1);
+      expect(store.current?.promise).toBe(promise1);
+      expect(store.current?.payload).toBe('third-payload');
     });
   });
 
@@ -50,20 +54,21 @@ describe('SingletonCallStore', () => {
       const result = store.update('updated-payload');
 
       expect(result).toBe(promise);
-      expect(store.current).toBe(promise);
+      expect(store.current?.promise).toBe(promise);
+      expect(store.current?.payload).toBe('updated-payload');
     });
 
     it('should return undefined when no current call exists', () => {
       const result = store.update('payload');
 
       expect(result).toBeUndefined();
-      expect(store.current).toBeNull();
+      expect(store.current).toBeUndefined();
     });
 
     it('should not create a new call when updating without an existing call', () => {
       store.update('payload');
 
-      expect(store.current).toBeNull();
+      expect(store.current).toBeUndefined();
     });
   });
 
@@ -74,12 +79,12 @@ describe('SingletonCallStore', () => {
 
       const result = await promise;
       expect(result).toBe('resolved-data');
-      expect(store.current).toBeNull();
+      expect(store.current).toBeUndefined();
     });
 
     it('should do nothing when no current call exists', () => {
       expect(() => store.resolve('data')).not.toThrow();
-      expect(store.current).toBeNull();
+      expect(store.current).toBeUndefined();
     });
 
     it('should clear the current call reference after resolution', async () => {
@@ -87,7 +92,7 @@ describe('SingletonCallStore', () => {
       store.resolve('data');
       await promise;
 
-      expect(store.current).toBeNull();
+      expect(store.current).toBeUndefined();
     });
   });
 
@@ -97,12 +102,12 @@ describe('SingletonCallStore', () => {
       store.reject('error-reason');
 
       await expect(promise).rejects.toBe('error-reason');
-      expect(store.current).toBeNull();
+      expect(store.current).toBeUndefined();
     });
 
     it('should do nothing when no current call exists', () => {
       expect(() => store.reject('error')).not.toThrow();
-      expect(store.current).toBeNull();
+      expect(store.current).toBeUndefined();
     });
 
     it('should clear the current call reference after rejection', async () => {
@@ -115,7 +120,7 @@ describe('SingletonCallStore', () => {
         // Expected to fail
       }
 
-      expect(store.current).toBeNull();
+      expect(store.current).toBeUndefined();
     });
   });
 
@@ -181,7 +186,7 @@ describe('SingletonCallStore', () => {
 
       const promise2 = store.call('second-payload');
       expect(promise2).not.toBe(promise1);
-      expect(store.current).toBe(promise2);
+      expect(store.current?.promise).toBe(promise2);
     });
   });
 });
