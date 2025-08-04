@@ -6,16 +6,16 @@ const { store } = defineProps<{
   store: CallStore;
 }>();
 
-const callStacks = useCallStore(store);
+const stack = useCallStore(store);
 </script>
 
 <template>
-  <div v-for="callStack in callStacks" :key="callStack.id" data-testid="callStack">
-    <p data-testid="payload">{{ callStack.payload }}</p>
-    <button data-testid="resolve" @click="() => callStack.resolve(true)">
+  <div v-for="call in stack" :key="call.id" data-testid="call">
+    <p data-testid="payload">{{ call.payload }}</p>
+    <button data-testid="resolve" @click="() => call.resolve(true)">
       OK
     </button>
-    <button data-testid="reject" @click="() => callStack.reject()">
+    <button data-testid="reject" @click="() => call.reject()">
       Cancel
     </button>
   </div>

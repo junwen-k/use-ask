@@ -16,7 +16,7 @@ describe('EventManager', () => {
 
     const event: AddEvent = {
       type: 'add',
-      callStack: {
+      call: {
         id: 1,
         payload: 'test',
         safe: false,
@@ -47,7 +47,7 @@ describe('EventManager', () => {
 
     const event: AddEvent = {
       type: 'add',
-      callStack: {
+      call: {
         id: 1,
         payload: 'test',
         safe: false,
@@ -77,7 +77,7 @@ describe('EventManager', () => {
 
     const event: AddEvent = {
       type: 'add',
-      callStack: {
+      call: {
         id: 1,
         payload: 'test',
         safe: false,
@@ -105,7 +105,7 @@ describe('EventManager', () => {
 
     const event: AddEvent = {
       type: 'add',
-      callStack: {
+      call: {
         id: 1,
         payload: 'test',
         safe: false,
@@ -131,7 +131,7 @@ describe('EventManager', () => {
 
     const event: AddEvent = {
       type: 'add',
-      callStack: {
+      call: {
         id: 1,
         payload: 'test',
         safe: false,
@@ -159,7 +159,7 @@ describe('EventManager', () => {
     const manager = new EventManager();
     const event: AddEvent = {
       type: 'add',
-      callStack: {
+      call: {
         id: 1,
         payload: 'test',
         safe: false,

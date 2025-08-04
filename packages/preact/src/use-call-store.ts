@@ -4,11 +4,11 @@ import { useEffect, useState } from 'preact/hooks';
 export function useCallStore<TPayload = unknown, TData = unknown, TReason = unknown>(
   store: CallStore<TPayload, TData, TReason>
 ) {
-  const [callStacks, setCallStacks] = useState(store.callStacks);
+  const [stack, setStack] = useState(store.stack);
 
   useEffect(() => {
     const listener = () => {
-      setCallStacks(store.callStacks);
+      setStack(store.stack);
     };
 
     store.addEventListener('add', listener);
@@ -26,5 +26,5 @@ export function useCallStore<TPayload = unknown, TData = unknown, TReason = unkn
     };
   }, [store]);
 
-  return callStacks;
+  return stack;
 }

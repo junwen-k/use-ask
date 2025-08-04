@@ -1,4 +1,4 @@
-import type { CallStack } from './call-store';
+import type { Call } from './call-store';
 
 /**
  * Represents the different types of events that can be dispatched.
@@ -35,30 +35,30 @@ export interface BaseEvent {
 export interface AddEvent<TPayload = unknown, TData = unknown, TReason = unknown>
   extends BaseEvent {
   type: 'add';
-  callStack: CallStack<TPayload, TData, TReason>;
+  call: Call<TPayload, TData, TReason>;
 }
 
 export interface UpdateEvent<TPayload = unknown, TData = unknown, TReason = unknown>
   extends BaseEvent {
   type: 'update';
-  callStack: CallStack<TPayload, TData, TReason>;
+  call: Call<TPayload, TData, TReason>;
 }
 export interface ResolveEvent<TPayload = unknown, TData = unknown, TReason = unknown>
   extends BaseEvent {
   type: 'resolve';
-  callStack: CallStack<TPayload, TData, TReason>;
+  call: Call<TPayload, TData, TReason>;
 }
 
 export interface RejectEvent<TPayload = unknown, TData = unknown, TReason = unknown>
   extends BaseEvent {
   type: 'reject';
-  callStack: CallStack<TPayload, TData, TReason>;
+  call: Call<TPayload, TData, TReason>;
 }
 
 export interface SettledEvent<TPayload = unknown, TData = unknown, TReason = unknown>
   extends BaseEvent {
   type: 'settled';
-  callStack: CallStack<TPayload, TData, TReason>;
+  call: Call<TPayload, TData, TReason>;
 }
 
 /**

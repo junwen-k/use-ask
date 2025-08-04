@@ -14,11 +14,11 @@ export interface SafeRejectedResult<TReason = unknown> {
   reason: TReason;
 }
 
-export type CallStack<TPayload = unknown, TData = unknown, TReason = unknown> =
-  | CallStackUnsafe<TPayload, TData, TReason>
-  | CallStackSafe<TPayload, TData, TReason>;
+export type Call<TPayload = unknown, TData = unknown, TReason = unknown> =
+  | CallUnsafe<TPayload, TData, TReason>
+  | CallSafe<TPayload, TData, TReason>;
 
-export interface CallStackBase<TPayload = unknown, TData = unknown, TReason = unknown> {
+export interface CallBase<TPayload = unknown, TData = unknown, TReason = unknown> {
   id: number;
   payload: TPayload;
   resolve: (data?: TData) => void;
@@ -26,14 +26,14 @@ export interface CallStackBase<TPayload = unknown, TData = unknown, TReason = un
   pending: boolean;
 }
 
-export interface CallStackUnsafe<TPayload = unknown, TData = unknown, TReason = unknown>
-  extends CallStackBase<TPayload, TData, TReason> {
+export interface CallUnsafe<TPayload = unknown, TData = unknown, TReason = unknown>
+  extends CallBase<TPayload, TData, TReason> {
   promise: Promise<TData>;
   safe: false;
 }
 
-export interface CallStackSafe<TPayload = unknown, TData = unknown, TReason = unknown>
-  extends CallStackBase<TPayload, TData, TReason> {
+export interface CallSafe<TPayload = unknown, TData = unknown, TReason = unknown>
+  extends CallBase<TPayload, TData, TReason> {
   promise: Promise<SafeResult<TData, TReason>>;
   safe: true;
 }
@@ -47,23 +47,23 @@ export interface CallOptions {
 }
 
 export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
-  #stack: Array<CallStack<TPayload, TData, TReason>> = [];
-  #unmountingDelay: number;
+  #stack: Array<Call<TPayload, TData, TReason>> = [];
 
   #eventManager: EventManager<TPayload, TData, TReason> = new EventManager<
     TPayload,
     TData,
     TReason
   >();
-  #timeoutIds: Map<Promise<unknown>, ReturnType<typeof setTimeout>> = new Map();
 
   #nextId = 0;
+  #unmountingDelay: number;
+  #timeoutIds: Map<Promise<unknown>, ReturnType<typeof setTimeout>> = new Map();
 
   constructor(options: CallStoreOptions = {}) {
     this.#unmountingDelay = options?.unmountingDelay ?? 0;
   }
 
-  get callStacks() {
+  get stack() {
     return this.#stack;
   }
 
@@ -77,17 +77,13 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
     this.#eventManager.dispatchEvent(event);
   }
 
-  #addCallStack(
+  #addCall(
     payload: TPayload,
     safe: false,
     options: CallOptions
-  ): CallStackUnsafe<TPayload, TData, TReason>;
-  #addCallStack(
-    payload: TPayload,
-    safe: true,
-    options: CallOptions
-  ): CallStackSafe<TPayload, TData, TReason>;
-  #addCallStack(
+  ): CallUnsafe<TPayload, TData, TReason>;
+  #addCall(payload: TPayload, safe: true, options: CallOptions): CallSafe<TPayload, TData, TReason>;
+  #addCall(
     payload: TPayload,
     safe: boolean,
     { unmountingDelay = this.#unmountingDelay }: CallOptions
@@ -95,26 +91,26 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
     const { promise, resolve: resolvePromise, reject: rejectPromise } = Promise.withResolvers();
 
     const handleSettlement = (type: 'resolve' | 'reject') => {
-      const index = this.#stack.indexOf(callStack);
+      const index = this.stack.indexOf(call);
 
-      this.#stack[index] = {
-        ...callStack,
+      this.stack[index] = {
+        ...call,
         pending: false,
       };
 
       this.#dispatchEvent({
         type,
-        callStack,
+        call,
       });
 
       if (unmountingDelay > 0) {
         const timeoutId = setTimeout(() => {
-          this.#deleteCallStack(callStack.promise, 'settled');
+          this.#deleteCall(call.promise, 'settled');
         }, unmountingDelay);
 
-        this.#timeoutIds.set(callStack.promise, timeoutId);
+        this.#timeoutIds.set(call.promise, timeoutId);
       } else {
-        this.#deleteCallStack(callStack.promise, 'settled');
+        this.#deleteCall(call.promise, 'settled');
       }
     };
 
@@ -138,7 +134,7 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
 
     const id = this.#generateId();
 
-    const callStack = {
+    const call = {
       id,
       payload,
       promise,
@@ -146,21 +142,21 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
       reject,
       pending: true,
       safe,
-    } as CallStack<TPayload, TData, TReason>;
+    } as Call<TPayload, TData, TReason>;
 
-    this.#stack.push(callStack);
+    this.stack.push(call);
 
     this.#dispatchEvent({
       type: 'add',
-      callStack,
+      call,
     });
 
-    return callStack;
+    return call;
   }
 
-  #deleteCallStack(promise: Promise<unknown>, eventType: Extract<EventType, 'delete' | 'settled'>) {
-    const callStack = this.#getCallStack(promise);
-    if (!callStack) {
+  #deleteCall(promise: Promise<unknown>, eventType: Extract<EventType, 'delete' | 'settled'>) {
+    const call = this.#getCall(promise);
+    if (!call) {
       return;
     }
 
@@ -170,76 +166,76 @@ export class CallStore<TPayload = unknown, TData = unknown, TReason = unknown> {
       this.#timeoutIds.delete(promise);
     }
 
-    this.#stack.splice(this.#stack.indexOf(callStack), 1);
+    this.stack.splice(this.stack.indexOf(call), 1);
 
     this.#dispatchEvent({
       type: eventType,
-      callStack,
+      call,
     });
 
-    return callStack;
+    return call;
   }
 
-  #getCallStack(promise: Promise<unknown>) {
-    return this.#stack.find((callStack) => callStack.promise === promise);
+  #getCall(promise: Promise<unknown>) {
+    return this.stack.find((call) => call.promise === promise);
   }
 
   /**
    * Adds a pending call stack to the store, returning the promise directly.
    */
   call(payload: TPayload, options: CallStoreOptions = {}) {
-    return this.#addCallStack(payload, false, options).promise;
+    return this.#addCall(payload, false, options).promise;
   }
 
   /**
    * Adds a safe pending call stack to the store, returning the promise directly.
    */
   callSafe(payload: TPayload, options: CallStoreOptions = {}) {
-    return this.#addCallStack(payload, true, options).promise;
+    return this.#addCall(payload, true, options).promise;
   }
 
   /**
    * Updates a call stack in the store.
    */
   update(promise: Promise<unknown>, payload: TPayload) {
-    const callStack = this.#getCallStack(promise);
-    if (!callStack) {
+    const call = this.#getCall(promise);
+    if (!call) {
       return;
     }
 
-    const index = this.#stack.indexOf(callStack);
+    const index = this.stack.indexOf(call);
 
-    const newCallStack = {
-      ...callStack,
+    const newCall = {
+      ...call,
       payload,
-    } as CallStack<TPayload, TData, TReason>;
+    } as Call<TPayload, TData, TReason>;
 
-    this.#stack[index] = newCallStack;
+    this.stack[index] = newCall;
 
     this.#dispatchEvent({
       type: 'update',
-      callStack: newCallStack,
+      call: newCall,
     });
 
-    return callStack;
+    return call;
   }
 
   resolve(promise: Promise<unknown>, data?: TData) {
-    const callStack = this.#getCallStack(promise);
-    if (!callStack) {
+    const call = this.#getCall(promise);
+    if (!call) {
       return;
     }
 
-    callStack.resolve(data);
+    call.resolve(data);
   }
 
   reject(promise: Promise<unknown>, reason?: TReason) {
-    const callStack = this.#getCallStack(promise);
-    if (!callStack) {
+    const call = this.#getCall(promise);
+    if (!call) {
       return;
     }
 
-    callStack.reject(reason);
+    call.reject(reason);
   }
 
   /**

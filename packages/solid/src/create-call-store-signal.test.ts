@@ -17,7 +17,7 @@ describe('createCallStore', () => {
   });
 
   describe('Store Operations', () => {
-    it('should reflect store changes in call stacks', () => {
+    it('should reflect store changes in stack', () => {
       const [store, createStoreSignal] = createCallStore();
 
       const signal = createStoreSignal();
@@ -36,11 +36,11 @@ describe('createCallStore', () => {
       store.call('test');
       expect(signal()).toHaveLength(1);
 
-      const callStack = signal()[0];
-      expect(callStack).toBeDefined();
+      const call = signal()[0];
+      expect(call).toBeDefined();
 
-      callStack?.resolve('success');
-      await expect(callStack?.promise).resolves.toBe('success');
+      call?.resolve('success');
+      await expect(call?.promise).resolves.toBe('success');
 
       expect(signal()).toHaveLength(0);
     });
@@ -53,11 +53,11 @@ describe('createCallStore', () => {
       store.call('test');
       expect(signal()).toHaveLength(1);
 
-      const callStack = signal()[0];
-      expect(callStack).toBeDefined();
+      const call = signal()[0];
+      expect(call).toBeDefined();
 
-      callStack?.reject('error');
-      await expect(callStack?.promise).rejects.toBe('error');
+      call?.reject('error');
+      await expect(call?.promise).rejects.toBe('error');
 
       expect(signal()).toHaveLength(0);
     });
@@ -70,11 +70,11 @@ describe('createCallStore', () => {
       store.callSafe('test');
       expect(signal()).toHaveLength(1);
 
-      const callStack = signal()[0];
-      expect(callStack).toBeDefined();
+      const call = signal()[0];
+      expect(call).toBeDefined();
 
-      callStack?.resolve('success');
-      await expect(callStack?.promise).resolves.toEqual({
+      call?.resolve('success');
+      await expect(call?.promise).resolves.toEqual({
         ok: true,
         data: 'success',
       });
@@ -90,11 +90,11 @@ describe('createCallStore', () => {
       store.callSafe('test');
       expect(signal()).toHaveLength(1);
 
-      const callStack = signal()[0];
-      expect(callStack).toBeDefined();
+      const call = signal()[0];
+      expect(call).toBeDefined();
 
-      callStack?.reject();
-      await expect(callStack?.promise).resolves.toEqual({
+      call?.reject();
+      await expect(call?.promise).resolves.toEqual({
         ok: false,
         reason: undefined,
       });

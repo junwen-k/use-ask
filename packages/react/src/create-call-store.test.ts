@@ -15,7 +15,7 @@ describe('createCallStore', () => {
   });
 
   describe('Store Operations', () => {
-    it('should reflect store changes in call stacks', () => {
+    it('should reflect store changes in stack', () => {
       const [store, useCallStore] = createCallStore();
 
       const { result } = renderHook(() => useCallStore());
@@ -37,12 +37,12 @@ describe('createCallStore', () => {
       });
       expect(result.current).toHaveLength(1);
 
-      const callStack = result.current[0];
-      expect(callStack).toBeDefined();
+      const call = result.current[0];
+      expect(call).toBeDefined();
 
       await act(async () => {
-        callStack?.resolve('success');
-        await expect(callStack?.promise).resolves.toBe('success');
+        call?.resolve('success');
+        await expect(call?.promise).resolves.toBe('success');
       });
 
       expect(result.current).toHaveLength(0);
@@ -58,12 +58,12 @@ describe('createCallStore', () => {
       });
       expect(result.current).toHaveLength(1);
 
-      const callStack = result.current[0];
-      expect(callStack).toBeDefined();
+      const call = result.current[0];
+      expect(call).toBeDefined();
 
       await act(async () => {
-        callStack?.reject('error');
-        await expect(callStack?.promise).rejects.toBe('error');
+        call?.reject('error');
+        await expect(call?.promise).rejects.toBe('error');
       });
 
       expect(result.current).toHaveLength(0);
@@ -79,12 +79,12 @@ describe('createCallStore', () => {
       });
       expect(result.current).toHaveLength(1);
 
-      const callStack = result.current[0];
-      expect(callStack).toBeDefined();
+      const call = result.current[0];
+      expect(call).toBeDefined();
 
       await act(async () => {
-        callStack?.resolve('success');
-        await expect(callStack?.promise).resolves.toEqual({
+        call?.resolve('success');
+        await expect(call?.promise).resolves.toEqual({
           ok: true,
           data: 'success',
         });
@@ -103,12 +103,12 @@ describe('createCallStore', () => {
       });
       expect(result.current).toHaveLength(1);
 
-      const callStack = result.current[0];
-      expect(callStack).toBeDefined();
+      const call = result.current[0];
+      expect(call).toBeDefined();
 
       await act(async () => {
-        callStack?.reject();
-        await expect(callStack?.promise).resolves.toEqual({
+        call?.reject();
+        await expect(call?.promise).resolves.toEqual({
           ok: false,
           reason: undefined,
         });

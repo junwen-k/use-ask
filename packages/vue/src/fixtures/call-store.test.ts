@@ -6,7 +6,7 @@ import Component from './call-store.vue';
 
 describe('CallStore', () => {
   describe('Store Operations', () => {
-    it('should reflect store changes in call stacks', async () => {
+    it('should reflect store changes in stack', async () => {
       const [store] = createCallStore();
 
       const screen = render(Component, {
@@ -36,7 +36,7 @@ describe('CallStore', () => {
       store.resolve(promise, 'success');
       await expect(promise).resolves.toBe('success');
 
-      await expect.element(screen.getByTestId('callStack')).not.toBeInTheDocument();
+      await expect.element(screen.getByTestId('call')).not.toBeInTheDocument();
     });
 
     it('should handle promise rejection', async () => {
@@ -55,7 +55,7 @@ describe('CallStore', () => {
       store.reject(promise, 'error');
       await expect(promise).rejects.toThrow('error');
 
-      await expect.element(screen.getByTestId('callStack')).not.toBeInTheDocument();
+      await expect.element(screen.getByTestId('call')).not.toBeInTheDocument();
     });
 
     it('should handle safe promise resolution', async () => {
@@ -77,7 +77,7 @@ describe('CallStore', () => {
         data: 'success',
       });
 
-      await expect.element(screen.getByTestId('callStack')).not.toBeInTheDocument();
+      await expect.element(screen.getByTestId('call')).not.toBeInTheDocument();
     });
 
     it('should handle safe promise rejection', async () => {
@@ -99,7 +99,7 @@ describe('CallStore', () => {
         reason: undefined,
       });
 
-      await expect.element(screen.getByTestId('callStack')).not.toBeInTheDocument();
+      await expect.element(screen.getByTestId('call')).not.toBeInTheDocument();
     });
   });
 });

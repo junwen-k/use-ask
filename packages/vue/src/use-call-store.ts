@@ -4,10 +4,10 @@ import { onBeforeUnmount, readonly, shallowRef } from 'vue';
 export function useCallStore<TPayload = unknown, TData = unknown, TReason = unknown>(
   store: CallStore<TPayload, TData, TReason>
 ) {
-  const callStacks = shallowRef(store.callStacks);
+  const stack = shallowRef(store.stack);
 
   const listener = () => {
-    callStacks.value = [...store.callStacks];
+    stack.value = [...store.stack];
   };
 
   store.addEventListener('add', listener);
@@ -24,5 +24,5 @@ export function useCallStore<TPayload = unknown, TData = unknown, TReason = unkn
     store.removeEventListener('reject', listener);
   });
 
-  return readonly(callStacks);
+  return readonly(stack);
 }

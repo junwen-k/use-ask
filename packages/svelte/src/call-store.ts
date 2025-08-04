@@ -30,9 +30,9 @@ export class CallStore<
     });
   }
 
-  get callStacks() {
+  get stack() {
     this.#subscribe();
 
-    return super.callStacks;
+    return super.stack;
   }
 }

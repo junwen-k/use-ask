@@ -4,11 +4,11 @@ import type { CallStore } from '@ui-call/core';
 export function useCallStoreSignal<TPayload = unknown, TData = unknown, TReason = unknown>(
   store: CallStore<TPayload, TData, TReason>
 ) {
-  const signal = useSignal(store.callStacks);
+  const signal = useSignal(store.stack);
 
   useSignalEffect(() => {
     const listener = () => {
-      signal.value = [...store.callStacks];
+      signal.value = [...store.stack];
     };
 
     store.addEventListener('add', listener);

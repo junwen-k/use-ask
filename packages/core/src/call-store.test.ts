@@ -22,8 +22,8 @@ describe('CallStore', () => {
       expect(promise).toBeDefined();
       expect(promise).toBeInstanceOf(Promise);
 
-      expect(store.callStacks).toHaveLength(1);
-      expect(store.callStacks[0].promise).toBe(promise);
+      expect(store.stack).toHaveLength(1);
+      expect(store.stack[0].promise).toBe(promise);
 
       store.resolve(promise, 'value');
 
@@ -36,8 +36,8 @@ describe('CallStore', () => {
       expect(promise).toBeDefined();
       expect(promise).toBeInstanceOf(Promise);
 
-      expect(store.callStacks).toHaveLength(1);
-      expect(store.callStacks[0].promise).toBe(promise);
+      expect(store.stack).toHaveLength(1);
+      expect(store.stack[0].promise).toBe(promise);
 
       store.resolve(promise, 'value');
 
@@ -96,8 +96,8 @@ describe('CallStore', () => {
 
       await expect(promise).resolves.toBe('value');
 
-      // The call stack's pending state should be false because it has been resolved.
-      expect(store.callStacks[0].pending).toBe(false);
+      // The call's pending state should be false because it has been resolved.
+      expect(store.stack[0].pending).toBe(false);
 
       expect(settledListener).not.toBeCalled();
 
@@ -106,7 +106,7 @@ describe('CallStore', () => {
       expect(settledListener).toBeCalledTimes(1);
       expect(settledListener).toBeCalledWith({
         type: 'settled',
-        callStack: expect.objectContaining({
+        call: expect.objectContaining({
           promise,
           pending: false,
         }),
@@ -120,7 +120,7 @@ describe('CallStore', () => {
 
       store.update(promise, 'updated');
 
-      expect(store.callStacks[0].payload).toBe('updated');
+      expect(store.stack[0].payload).toBe('updated');
     });
 
     it('should handle updating a non-existent call stack gracefully', () => {
@@ -153,7 +153,7 @@ describe('CallStore', () => {
       expect(addListener).toBeCalledTimes(1);
       expect(addListener).toBeCalledWith({
         type: 'add',
-        callStack: expect.objectContaining({
+        call: expect.objectContaining({
           promise,
         }),
       });
@@ -170,7 +170,7 @@ describe('CallStore', () => {
       expect(updateListener).toBeCalledTimes(1);
       expect(updateListener).toBeCalledWith({
         type: 'update',
-        callStack: expect.objectContaining({
+        call: expect.objectContaining({
           promise,
           payload: 'updated',
         }),
@@ -190,7 +190,7 @@ describe('CallStore', () => {
       expect(resolveListener).toBeCalledTimes(1);
       expect(resolveListener).toBeCalledWith({
         type: 'resolve',
-        callStack: expect.objectContaining({
+        call: expect.objectContaining({
           promise,
         }),
       });
@@ -209,7 +209,7 @@ describe('CallStore', () => {
       expect(rejectListener).toBeCalledTimes(1);
       expect(rejectListener).toBeCalledWith({
         type: 'reject',
-        callStack: expect.objectContaining({
+        call: expect.objectContaining({
           promise,
         }),
       });

@@ -1,11 +1,11 @@
-import type { CallStack, CallStore } from '@ui-call/core';
+import type { Call, CallStore } from '@ui-call/core';
 import { from } from 'solid-js';
 
 export function createCallStoreSignal<TPayload = unknown, TData = unknown, TReason = unknown>(
   store: CallStore<TPayload, TData, TReason>
 ) {
-  return from<Array<CallStack<TPayload, TData, TReason>>>((set) => {
-    const listener = () => set(store.callStacks);
+  return from<Array<Call<TPayload, TData, TReason>>>((set) => {
+    const listener = () => set(store.stack);
 
     store.addEventListener('add', listener);
     store.addEventListener('update', listener);
@@ -20,5 +20,5 @@ export function createCallStoreSignal<TPayload = unknown, TData = unknown, TReas
       store.removeEventListener('reject', listener);
       store.removeEventListener('settled', listener);
     };
-  }, store.callStacks);
+  }, store.stack);
 }

@@ -20,7 +20,7 @@ export function useCallStore<TPayload = unknown, TData = unknown, TReason = unkn
         store.removeEventListener('reject', listener);
       };
     },
-    () => store.callStacks,
-    () => store.callStacks
+    () => store.stack,
+    () => store.stack
   );
 }
