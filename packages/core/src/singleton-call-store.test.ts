@@ -11,7 +11,7 @@ describe('SingletonCallStore', () => {
 
   describe('when creating a new store', () => {
     it('should initialize with no current call', () => {
-      expect(store.current).toBeUndefined();
+      expect(store.current).toBeNull();
     });
   });
 
@@ -62,13 +62,13 @@ describe('SingletonCallStore', () => {
       const result = store.update('payload');
 
       expect(result).toBeUndefined();
-      expect(store.current).toBeUndefined();
+      expect(store.current).toBeNull();
     });
 
     it('should not create a new call when updating without an existing call', () => {
       store.update('payload');
 
-      expect(store.current).toBeUndefined();
+      expect(store.current).toBeNull();
     });
   });
 
@@ -79,12 +79,12 @@ describe('SingletonCallStore', () => {
 
       const result = await promise;
       expect(result).toBe('resolved-data');
-      expect(store.current).toBeUndefined();
+      expect(store.current).toBeNull();
     });
 
     it('should do nothing when no current call exists', () => {
       expect(() => store.resolve('data')).not.toThrow();
-      expect(store.current).toBeUndefined();
+      expect(store.current).toBeNull();
     });
 
     it('should clear the current call reference after resolution', async () => {
@@ -92,7 +92,7 @@ describe('SingletonCallStore', () => {
       store.resolve('data');
       await promise;
 
-      expect(store.current).toBeUndefined();
+      expect(store.current).toBeNull();
     });
   });
 
@@ -102,12 +102,12 @@ describe('SingletonCallStore', () => {
       store.reject('error-reason');
 
       await expect(promise).rejects.toBe('error-reason');
-      expect(store.current).toBeUndefined();
+      expect(store.current).toBeNull();
     });
 
     it('should do nothing when no current call exists', () => {
       expect(() => store.reject('error')).not.toThrow();
-      expect(store.current).toBeUndefined();
+      expect(store.current).toBeNull();
     });
 
     it('should clear the current call reference after rejection', async () => {
@@ -120,7 +120,7 @@ describe('SingletonCallStore', () => {
         // Expected to fail
       }
 
-      expect(store.current).toBeUndefined();
+      expect(store.current).toBeNull();
     });
   });
 

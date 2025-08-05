@@ -25,7 +25,7 @@ describe('createSingletonCallStore', () => {
       const [, useSingletonCallStore] = createSingletonCallStore();
       const { result } = renderHook(() => useSingletonCallStore());
 
-      expect(result.current).toBeUndefined();
+      expect(result.current).toBeNull();
     });
 
     it('should return the current call when it exists', () => {
@@ -95,7 +95,7 @@ describe('createSingletonCallStore', () => {
         await callPromise!;
       });
 
-      expect(result.current).toBeUndefined();
+      expect(result.current).toBeNull();
     });
 
     it('should return undefined when the current call is rejected', async () => {
@@ -118,7 +118,7 @@ describe('createSingletonCallStore', () => {
         }
       });
 
-      expect(result.current).toBeUndefined();
+      expect(result.current).toBeNull();
     });
 
     it('should create a new call after resolution', async () => {
@@ -193,7 +193,7 @@ describe('createSingletonCallStore', () => {
         await new Promise((resolve) => setTimeout(resolve, 60));
       });
 
-      expect(result.current).toBeUndefined();
+      expect(result.current).toBeNull();
     });
   });
 

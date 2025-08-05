@@ -16,7 +16,7 @@ describe('createSingletonCallStore', () => {
       const [, createStoreSignal] = createSingletonCallStore();
       const signal = createStoreSignal();
 
-      expect(signal()).toBeUndefined();
+      expect(signal()).toBeNull();
     });
   });
 
@@ -68,7 +68,7 @@ describe('createSingletonCallStore', () => {
       const call = signal();
       call?.resolve('resolved-data');
       await expect(call?.promise).resolves.toBe('resolved-data');
-      expect(signal()).toBeUndefined();
+      expect(signal()).toBeNull();
     });
 
     it('should allow new calls after resolution', async () => {
@@ -80,7 +80,7 @@ describe('createSingletonCallStore', () => {
       call1?.resolve('first-result');
       await call1?.promise;
 
-      expect(signal()).toBeUndefined();
+      expect(signal()).toBeNull();
 
       store.call('second-payload');
       expect(signal()?.payload).toBe('second-payload');
@@ -98,7 +98,7 @@ describe('createSingletonCallStore', () => {
       const call = signal();
       call?.reject('error-message');
       await expect(call?.promise).rejects.toBe('error-message');
-      expect(signal()).toBeUndefined();
+      expect(signal()).toBeNull();
     });
 
     it('should allow new calls after rejection', async () => {
@@ -110,7 +110,7 @@ describe('createSingletonCallStore', () => {
       call1?.reject('first-error');
       await expect(call1?.promise).rejects.toBe('first-error');
 
-      expect(signal()).toBeUndefined();
+      expect(signal()).toBeNull();
 
       store.call('second-payload');
       expect(signal()?.payload).toBe('second-payload');

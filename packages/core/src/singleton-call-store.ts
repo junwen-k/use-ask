@@ -8,7 +8,7 @@ export class SingletonCallStore<TPayload = unknown, TData = unknown, TReason = u
   }
 
   get current() {
-    return this.#callStore.stack.at(-1);
+    return this.#callStore.stack.at(-1) ?? null;
   }
 
   call(payload: TPayload, options: CallStoreOptions = {}) {

@@ -1,18 +1,24 @@
 import type { Call, CallStore } from '@ui-call/core';
-import { createSignal } from 'solid-js';
+import { from } from 'solid-js';
 
 export function createCallStoreSignal<TPayload = unknown, TData = unknown, TReason = unknown>(
   store: CallStore<TPayload, TData, TReason>
 ) {
-  const [signal, setSignal] = createSignal<Array<Call<TPayload, TData, TReason>>>(store.stack);
+  return from<Array<Call<TPayload, TData, TReason>>>((set) => {
+    const listener = () => set(store.stack);
 
-  const listener = () => setSignal([...store.stack]);
+    store.addEventListener('add', listener);
+    store.addEventListener('update', listener);
+    store.addEventListener('resolve', listener);
+    store.addEventListener('reject', listener);
+    store.addEventListener('settled', listener);
 
-  store.addEventListener('add', listener);
-  store.addEventListener('update', listener);
-  store.addEventListener('resolve', listener);
-  store.addEventListener('reject', listener);
-  store.addEventListener('settled', listener);
-
-  return signal;
+    return () => {
+      store.removeEventListener('add', listener);
+      store.removeEventListener('update', listener);
+      store.removeEventListener('resolve', listener);
+      store.removeEventListener('reject', listener);
+      store.removeEventListener('settled', listener);
+    };
+  }, store.stack);
 }

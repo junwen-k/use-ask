@@ -1,22 +1,26 @@
 import type { Call, SingletonCallStore } from '@ui-call/core';
-import { createSignal } from 'solid-js';
+import { from } from 'solid-js';
 
 export function createSingletonCallStoreSignal<
   TPayload = unknown,
   TData = unknown,
   TReason = unknown,
 >(store: SingletonCallStore<TPayload, TData, TReason>) {
-  const [signal, setSignal] = createSignal<Call<TPayload, TData, TReason> | undefined>(
-    store.current
-  );
+  return from<Call<TPayload, TData, TReason> | null>((set) => {
+    const listener = () => set(store.current);
 
-  const listener = () => setSignal(store.current);
+    store.addEventListener('add', listener);
+    store.addEventListener('update', listener);
+    store.addEventListener('resolve', listener);
+    store.addEventListener('reject', listener);
+    store.addEventListener('settled', listener);
 
-  store.addEventListener('add', listener);
-  store.addEventListener('update', listener);
-  store.addEventListener('resolve', listener);
-  store.addEventListener('reject', listener);
-  store.addEventListener('settled', listener);
-
-  return signal;
+    return () => {
+      store.removeEventListener('add', listener);
+      store.removeEventListener('update', listener);
+      store.removeEventListener('resolve', listener);
+      store.removeEventListener('reject', listener);
+      store.removeEventListener('settled', listener);
+    };
+  }, store.current);
 }
