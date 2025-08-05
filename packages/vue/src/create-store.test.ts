@@ -1,5 +1,6 @@
 import { CallStore, SingletonCallStore } from '@ui-call/core';
 import { describe, expect, it } from 'vitest';
+import { isReactive, reactive } from 'vue';
 
 import { createCallStore, createSingletonCallStore } from './create-store';
 
@@ -25,6 +26,20 @@ describe('createCallStore', () => {
       expect(store1).toBeInstanceOf(CallStore);
       expect(store2).toBeInstanceOf(CallStore);
     });
+
+    it('should return a non-proxied store instance', () => {
+      const store = createCallStore();
+
+      expect(isReactive(store)).toBe(false);
+    });
+
+    it('should return a non-proxied store instance when wrapped in reactive', () => {
+      const store = createCallStore();
+      const reactiveWrapper = reactive({ store });
+
+      expect(isReactive(reactiveWrapper)).toBe(true);
+      expect(isReactive(reactiveWrapper.store)).toBe(false);
+    });
   });
 });
 
@@ -49,6 +64,20 @@ describe('createSingletonCallStore', () => {
       expect(store1).not.toBe(store2);
       expect(store1).toBeInstanceOf(SingletonCallStore);
       expect(store2).toBeInstanceOf(SingletonCallStore);
+    });
+
+    it('should return a non-proxied store instance', () => {
+      const store = createSingletonCallStore();
+
+      expect(isReactive(store)).toBe(false);
+    });
+
+    it('should return a non-proxied store instance when wrapped in reactive', () => {
+      const store = createSingletonCallStore();
+      const reactiveWrapper = reactive({ store });
+
+      expect(isReactive(reactiveWrapper)).toBe(true);
+      expect(isReactive(reactiveWrapper.store)).toBe(false);
     });
   });
 });
