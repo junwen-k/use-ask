@@ -13,7 +13,8 @@ export class SingletonCallStore<TPayload = unknown, TData = unknown, TReason = u
 
   call(payload: TPayload, options: CallStoreOptions = {}) {
     if (this.current) {
-      return this.update(payload);
+      this.update(payload);
+      return this.current.promise;
     }
 
     return this.#callStore.call(payload, options);
