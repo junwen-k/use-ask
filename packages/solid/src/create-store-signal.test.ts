@@ -153,8 +153,7 @@ describe('createCallStoreSignal', () => {
       const store = new CallStore({ unmountingDelay: 50 });
       const { result } = renderHook(() => createCallStoreSignal(store));
 
-      let promise: Promise<unknown>;
-      promise = store.call('test-payload');
+      const promise = store.call('test-payload');
 
       store.resolve(promise!, 'success');
       await promise!;
