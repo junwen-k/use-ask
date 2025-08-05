@@ -12,6 +12,6 @@
   <div data-testid="call">
     <p data-testid="payload">{call.payload}</p>
     <button data-testid="resolve" onclick={() => call.resolve(true)}>OK</button>
-    <button data-testid="reject" onclick={() => call.reject()}>Cancel</button>
+    <button data-testid="reject" onclick={() => call.reject('error')}>Cancel</button>
   </div>
 {/each}

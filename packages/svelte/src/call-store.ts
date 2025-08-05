@@ -1,5 +1,10 @@
-import { CallStore as CoreCallStore } from '@ui-call/core';
+import {
+  CallStore as CoreCallStore,
+  SingletonCallStore as CoreSingletonCallStore,
+} from '@ui-call/core';
 import { createSubscriber } from 'svelte/reactivity';
+
+const EVENTS = ['add', 'update', 'settled', 'resolve', 'reject'] as const;
 
 export class CallStore<
   TPayload = unknown,
@@ -14,18 +19,14 @@ export class CallStore<
     this.#subscribe = createSubscriber((update) => {
       const listener = () => update();
 
-      this.addEventListener('add', listener);
-      this.addEventListener('update', listener);
-      this.addEventListener('settled', listener);
-      this.addEventListener('resolve', listener);
-      this.addEventListener('reject', listener);
+      EVENTS.forEach((event) => {
+        this.addEventListener(event, listener);
+      });
 
       return () => {
-        this.removeEventListener('add', listener);
-        this.removeEventListener('update', listener);
-        this.removeEventListener('settled', listener);
-        this.removeEventListener('resolve', listener);
-        this.removeEventListener('reject', listener);
+        EVENTS.forEach((event) => {
+          this.removeEventListener(event, listener);
+        });
       };
     });
   }
@@ -34,5 +35,39 @@ export class CallStore<
     this.#subscribe();
 
     return super.stack;
+  }
+}
+
+export class SingletonCallStore<
+  TPayload = unknown,
+  TData = unknown,
+  TReason = unknown,
+> extends CoreSingletonCallStore<TPayload, TData, TReason> {
+  #subscribe: () => void;
+
+  constructor(
+    ...args: ConstructorParameters<typeof CoreSingletonCallStore<TPayload, TData, TReason>>
+  ) {
+    super(...args);
+
+    this.#subscribe = createSubscriber((update) => {
+      const listener = () => update();
+
+      EVENTS.forEach((event) => {
+        this.addEventListener(event, listener);
+      });
+
+      return () => {
+        EVENTS.forEach((event) => {
+          this.removeEventListener(event, listener);
+        });
+      };
+    });
+  }
+
+  get current() {
+    this.#subscribe();
+
+    return super.current;
   }
 }
