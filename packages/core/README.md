@@ -1,4 +1,4 @@
-![UI Call Logo](./docs/@ui-call.svg)
+![@ui-call's Logo](./docs/@ui-call.svg)
 
 # @ui-call/core
 
@@ -65,6 +65,8 @@ const store = new CallStore<{ message: string }, string, string>();
 
 const result = await store.call({ message: 'Are you sure?' });
 
+// ...
+
 // Render all active calls in your UI
 store.stack.map((call) => {
   // Your UI rendering logic here
@@ -84,25 +86,24 @@ const store = new SingletonCallStore<string, boolean>();
 
 const confirmed = await store.call('Are you sure?');
 
-// Render the current call (if any)
-if (store.current) {
-  const call = store.current;
-  // Your modal/dialog UI here
-  // call.resolve(true);  // User confirmed
-  // call.resolve(false); // User cancelled
-}
+// ...
+
+// Your UI rendering logic here
+const call = store.current;
+// call.resolve(true);  // User confirmed
+// call.resolve(false); // User cancelled
 ```
 
 ## 🔧 Features
 
-### Dynamic Updates
+### Update
 
-Update call payloads in real-time for dynamic content and multi-step interactions:
+Update call payloads in real-time for dynamic content:
 
 ```ts
 // Method 1: Using the call object directly from stack
 store.stack.forEach((call) => {
-  call.update({ message: 'Update Payload' });
+  call.update({ message: '...' });
 });
 
 // Method 2: Using the promise reference
@@ -144,10 +145,9 @@ Configure unmounting delays to match your exit animation durations:
 const store = new CallStore<{ message: string }, string, string>({
   unmountingDelay: 1000,
 });
-
-// you can use call.pending to conditionally add class
-// className={cn(!call.pending && 'exit-animation')}
 ```
+
+The `call.pending` boolean may be used to apply your animation CSS class.
 
 ## Acknowledgments
 
