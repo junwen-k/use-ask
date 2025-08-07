@@ -1,4 +1,4 @@
-![@ui-call's Logo](./docs/@ui-call.svg)
+![@ui-call's Logo](../../docs/@ui-call.svg)
 
 # @ui-call/core
 
