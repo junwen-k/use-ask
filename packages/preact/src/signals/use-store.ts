@@ -10,7 +10,7 @@ export function useCallStore<TPayload = unknown, TData = unknown, TReason = unkn
 
   useSignalEffect(() => {
     const listener = () => {
-      stack.value = store.stack;
+      stack.value = [...store.stack];
     };
 
     EVENTS.forEach((event) => {

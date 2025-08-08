@@ -7,7 +7,7 @@ export function createCallStoreSignal<TPayload = unknown, TData = unknown, TReas
   store: CallStore<TPayload, TData, TReason>
 ) {
   return from<Array<Call<TPayload, TData, TReason>>>((set) => {
-    const listener = () => set(store.stack);
+    const listener = () => set([...store.stack]);
 
     EVENTS.forEach((event) => {
       store.addEventListener(event, listener);

@@ -10,7 +10,7 @@ export function useCallStore<TPayload = unknown, TData = unknown, TReason = unkn
 
   useEffect(() => {
     const listener = () => {
-      setStack(store.stack);
+      setStack([...store.stack]);
     };
 
     EVENTS.forEach((event) => {
