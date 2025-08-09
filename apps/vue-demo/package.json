@@ -11,9 +11,13 @@
   },
   "dependencies": {
     "@nuxt/eslint": "1.8.0",
+    "@ui-call/vue": "workspace:*",
     "eslint": "^9.32.0",
     "nuxt": "^4.0.1",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
   }
 }
