@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script lang="ts" module>
   import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
 
   import { SingletonCallStore } from '@ui-call/svelte';
