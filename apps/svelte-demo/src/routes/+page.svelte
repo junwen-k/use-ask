@@ -2,7 +2,7 @@
   import { Button } from '$lib/components/ui/button/index.js';
   import { Confirmer, confirm } from '$lib/components/ui/confirmer/index.js';
 
-  import Toast, { toast } from '$lib/components/ui/toast/toast.svelte';
+  import { Toast, toast } from '$lib/components/ui/toast/index.js';
 </script>
 
 <Confirmer />
