@@ -1,7 +1,13 @@
 <script lang="ts">
   import { Button } from '$lib/components/ui/button/index.js';
+  import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+  } from '$lib/components/ui/card/index.js';
   import { Confirmer, confirm } from '$lib/components/ui/confirmer/index.js';
-
   import { Toast, toast } from '$lib/components/ui/toast/index.js';
 </script>
 
@@ -13,16 +19,12 @@
     <p class="text-muted-foreground">Small examples showing how `CallStore` powers UI patterns.</p>
   </section>
 
-  <section class="rounded-lg border border-border bg-card text-card-foreground shadow-sm">
-    <div class="flex items-center justify-between border-b p-4">
-      <div>
-        <h2 class="text-lg font-semibold">Confirmer</h2>
-        <p class="text-sm text-muted-foreground">
-          Imperative confirm dialog built with `SingletonCallStore`.
-        </p>
-      </div>
-    </div>
-    <div class="p-4">
+  <Card>
+    <CardHeader>
+      <CardTitle>Confirmer</CardTitle>
+      <CardDescription>Imperative confirm dialog built with `SingletonCallStore`.</CardDescription>
+    </CardHeader>
+    <CardContent>
       <Confirmer />
       <Button
         variant="destructive"
@@ -35,17 +37,15 @@
       >
         Delete
       </Button>
-    </div>
-  </section>
+    </CardContent>
+  </Card>
 
-  <section class="rounded-lg border border-border bg-card text-card-foreground shadow-sm">
-    <div class="flex items-center justify-between border-b p-4">
-      <div>
-        <h2 class="text-lg font-semibold">Toast</h2>
-        <p class="text-sm text-muted-foreground">Sonner-like API implemented with `CallStore`.</p>
-      </div>
-    </div>
-    <div class="p-4">
+  <Card>
+    <CardHeader>
+      <CardTitle>Toast</CardTitle>
+      <CardDescription>Sonner-like API implemented with `CallStore`.</CardDescription>
+    </CardHeader>
+    <CardContent>
       <div class="flex flex-wrap gap-2">
         <Button
           onclick={() =>
@@ -96,6 +96,6 @@
           Toast with Action
         </Button>
       </div>
-    </div>
-  </section>
+    </CardContent>
+  </Card>
 </div>

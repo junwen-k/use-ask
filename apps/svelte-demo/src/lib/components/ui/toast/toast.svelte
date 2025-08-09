@@ -42,7 +42,8 @@
       variant: {
         success:
           'border-green-300 bg-green-50 text-green-900 dark:border-green-900/40 dark:bg-green-950 dark:text-green-100',
-        destructive: 'bg-destructive/10 text-destructive border-destructive/20',
+        destructive:
+          'border-red-300 bg-red-50 text-red-900 dark:border-red-900/40 dark:bg-red-950 dark:text-red-100',
         info: 'border-blue-300 bg-blue-50 text-blue-900 dark:border-blue-900/40 dark:bg-blue-950 dark:text-blue-100',
         default: 'bg-background text-foreground border-border',
       },
