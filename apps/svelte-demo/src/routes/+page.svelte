@@ -2,14 +2,7 @@
   import { Button } from '$lib/components/ui/button/index.js';
   import { Confirmer, confirm } from '$lib/components/ui/confirmer/index.js';
 
-  import Toast, {
-    toast,
-    // dismiss,
-    // error,
-    // info,
-    // success,
-    // update,
-  } from '$lib/components/ui/toast/toast.svelte';
+  import Toast, { toast } from '$lib/components/ui/toast/toast.svelte';
 </script>
 
 <Confirmer />
@@ -37,11 +30,7 @@
   <Button
     variant="secondary"
     onclick={() =>
-      toast({
-        title: 'Success!',
-        description: 'Your action was completed successfully',
-        variant: 'success',
-      })}
+      toast.success({ title: 'Success!', description: 'Your action was completed successfully' })}
   >
     Success Toast
   </Button>
@@ -49,23 +38,14 @@
   <Button
     variant="destructive"
     onclick={() =>
-      toast({
-        title: 'Error!',
-        description: 'Something went wrong with your request',
-        variant: 'destructive',
-      })}
+      toast.error({ title: 'Error!', description: 'Something went wrong with your request' })}
   >
     Error Toast
   </Button>
 
   <Button
     variant="outline"
-    onclick={() =>
-      toast({
-        title: 'Info',
-        description: 'Here is some useful information',
-        variant: 'info',
-      })}
+    onclick={() => toast.info({ title: 'Info', description: 'Here is some useful information' })}
   >
     Info Toast
   </Button>

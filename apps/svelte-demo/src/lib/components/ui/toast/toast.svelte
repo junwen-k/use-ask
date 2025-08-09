@@ -20,7 +20,7 @@
     unmountingDelay: 150,
   });
 
-  export function toast(payload: ToastPayload) {
+  function t(payload: ToastPayload) {
     const { duration = DEFAULT_DURATION_MS, ...rest } = payload ?? {};
     const promise = toastStore.call(rest);
     if (duration > 0) {
@@ -31,25 +31,33 @@
     return promise;
   }
 
-  export function success(payload: Omit<ToastPayload, 'variant'>) {
-    return toast({ variant: 'success', ...payload });
+  function success(payload: Omit<ToastPayload, 'variant'>) {
+    return t({ variant: 'success', ...payload });
   }
 
-  export function error(payload: Omit<ToastPayload, 'variant'>) {
-    return toast({ variant: 'destructive', ...payload });
+  function error(payload: Omit<ToastPayload, 'variant'>) {
+    return t({ variant: 'destructive', ...payload });
   }
 
-  export function info(payload: Omit<ToastPayload, 'variant'>) {
-    return toast({ variant: 'info', ...payload });
+  function info(payload: Omit<ToastPayload, 'variant'>) {
+    return t({ variant: 'info', ...payload });
   }
 
-  export function dismiss(promise: ReturnType<typeof toast>) {
+  function dismiss(promise: ReturnType<typeof t>) {
     toastStore.resolve(promise);
   }
 
-  export function update(promise: ReturnType<typeof toast>, payload: Partial<ToastPayload>) {
+  function update(promise: ReturnType<typeof t>, payload: Partial<ToastPayload>) {
     return toastStore.update(promise, payload as ToastPayload);
   }
+
+  export const toast = Object.assign(t, {
+    success,
+    error,
+    info,
+    dismiss,
+    update,
+  });
 
   export type ToastProps = {
     position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
@@ -58,6 +66,10 @@
 
 <script lang="ts">
   let { position = 'top-right' }: ToastProps = $props();
+  import CheckCircle2Icon from '@lucide/svelte/icons/check-circle-2';
+  import XCircle from '@lucide/svelte/icons/x-circle';
+  import Info from '@lucide/svelte/icons/info';
+  import Bell from '@lucide/svelte/icons/bell';
 
   function containerClass() {
     const base = 'pointer-events-none fixed z-50 flex gap-2 p-4';
@@ -78,11 +90,24 @@
       case 'success':
         return 'border-green-300 bg-green-50 text-green-900 dark:border-green-900/40 dark:bg-green-950 dark:text-green-100';
       case 'destructive':
-        return 'border-red-300 bg-red-50 text-red-900 dark:border-red-900/40 dark:bg-red-950 dark:text-red-100';
+        return 'bg-destructive/10 text-destructive border-destructive/20';
       case 'info':
         return 'border-blue-300 bg-blue-50 text-blue-900 dark:border-blue-900/40 dark:bg-blue-950 dark:text-blue-100';
       default:
-        return 'bg-background text-foreground';
+        return 'bg-background text-foreground border-border';
+    }
+  }
+
+  function iconClass(variant: ToastPayload['variant']) {
+    switch (variant) {
+      case 'success':
+        return 'text-green-600 dark:text-green-400';
+      case 'destructive':
+        return 'text-red-600 dark:text-red-400';
+      case 'info':
+        return 'text-blue-600 dark:text-blue-400';
+      default:
+        return 'text-foreground/80';
     }
   }
 </script>
@@ -90,12 +115,23 @@
 <div class={containerClass()}>
   {#each toastStore.stack as call (call.id)}
     <div
-      class={`pointer-events-auto w-80 overflow-hidden rounded-md border shadow ${variantClass(call.payload.variant)}`}
+      class={`toast pointer-events-auto w-80 max-w-sm overflow-hidden rounded-md border shadow-lg ${variantClass(call.payload.variant)}`}
       data-state={call.pending ? 'open' : 'closed'}
       aria-live="polite"
       role="status"
     >
       <div class="flex items-start p-4">
+        <div class="mr-3 mt-0.5">
+          {#if call.payload.variant === 'success'}
+            <CheckCircle2Icon class={`h-5 w-5 ${iconClass(call.payload.variant)}`} />
+          {:else if call.payload.variant === 'destructive'}
+            <XCircle class={`h-5 w-5 ${iconClass(call.payload.variant)}`} />
+          {:else if call.payload.variant === 'info'}
+            <Info class={`h-5 w-5 ${iconClass(call.payload.variant)}`} />
+          {:else}
+            <Bell class={`h-5 w-5 ${iconClass(call.payload.variant)}`} />
+          {/if}
+        </div>
         <div class="flex-1">
           {#if call.payload.title}
             <div class="text-sm font-semibold leading-none tracking-tight">
@@ -110,7 +146,7 @@
         </div>
         {#if call.payload.action}
           <button
-            class="ml-3 inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none"
+            class="ml-3 inline-flex h-8 shrink-0 items-center justify-center rounded-md border border-border bg-transparent px-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background"
             onclick={() => {
               call.payload.action?.onClick?.();
               toastStore.resolve(call.promise);
@@ -120,7 +156,7 @@
           </button>
         {/if}
         <button
-          class="ml-2 inline-flex h-8 shrink-0 items-center justify-center rounded-md px-2 text-sm opacity-60 hover:opacity-100 focus:outline-none"
+          class="ml-2 inline-flex h-8 shrink-0 items-center justify-center rounded-md px-2 text-sm opacity-60 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background"
           aria-label="Close"
           onclick={() => toastStore.resolve(call.promise)}
         >
@@ -130,3 +166,39 @@
     </div>
   {/each}
 </div>
+
+<style>
+  .toast {
+    will-change: opacity, transform;
+  }
+
+  [data-state='open'] {
+    animation: toast-in 160ms ease-out;
+  }
+
+  [data-state='closed'] {
+    animation: toast-out 160ms ease-in forwards;
+  }
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes toast-out {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+</style>
