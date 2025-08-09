@@ -1,9 +1,12 @@
+'use client';
+
 import {
   createCallStore,
   createSingletonCallStore,
   useCallStore,
   useSingletonCallStore,
-} from '@ui-call/preact';
+} from '@ui-call/react';
+import { ConfirmationDialog } from './confirmation-dialog';
 
 const confirmStore = createSingletonCallStore<string>();
 
@@ -18,15 +21,12 @@ export function Confirmer() {
   }
 
   return (
-    <dialog
+    <ConfirmationDialog
       open={call.pending}
+      onConfirm={() => call.resolve(true)}
       onCancel={() => call.resolve(false)}
-      onClose={() => call.resolve(false)}
-    >
-      <p>{call.payload}</p>
-      <button onClick={() => call.resolve(true)}>OK</button>
-      <button onClick={() => call.resolve(false)}>Cancel</button>
-    </dialog>
+      title={call.payload}
+    />
   );
 }
 
