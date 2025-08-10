@@ -2,11 +2,7 @@
 
 # @ui-call/react
 
-Idiomatic React binding for the core call store with seamless reactivity integration.
-
-## ✨ Key Features
-
-- 🌐 **Idiomatic React API** - Uses `useSyncExternalStore` for optimal React 18+ compatibility
+Idiomatic React bindings for `@ui-call/core`, built on top of `useSyncExternalStore` for stable, performant reactivity in React 18+.
 
 ## 📦 Installation
 
@@ -35,21 +31,9 @@ export const confirm = store.call;
 function Confirmer() {
   const call = useSingletonCallStore(store);
 
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    if (call.pending) {
-      dialogRef.current?.showModal();
-    } else {
-      dialogRef.current?.close();
-    }
-  }, [call.pending]);
-
-  if (!call.pending) return null;
-
   return (
     // Using native <dialog> for brevity - customize the UI as needed
-    <dialog ref={dialogRef} onCancel={() => call.resolve(false)}>
+    <dialog open={call.pending} onCancel={() => call.resolve(false)}>
       <p>{call.payload}</p>
       <button onClick={() => call.resolve(false)}>Cancel</button>
       <button onClick={() => call.resolve(true)}>OK</button>
