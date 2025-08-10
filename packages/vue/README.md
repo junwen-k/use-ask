@@ -61,12 +61,11 @@ Imperatively trigger your custom UI from anywhere in your app:
 <script setup lang="ts">
 import { confirm } from '@/components/ui/confirmer';
 
-function onDelete() {
-  confirm({
-    title: 'Are you absolutely sure?',
-    message:
-      'This action cannot be undone. This will permanently delete your account and remove your data from our servers.',
-  }).then((result) => alert(`User ${result ? 'confirmed' : 'cancelled'} the action`));
+async function handleDelete() {
+  const confirmed = await confirm('Are you sure you want to delete this item?');
+  if (confirmed) {
+    deleteItem();
+  }
 }
 </script>
 
