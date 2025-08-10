@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Toast, toast } from '@/components/ui/toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Confirmer, confirm } from '@/components/ui/confirmer';
 import { ColorModeProvider } from '@kobalte/core';
@@ -50,7 +51,7 @@ export default function App() {
             </CardContent>
           </Card>
 
-          {/* <Toast /> */}
+          <Toast />
           <Card>
             <CardHeader>
               <CardTitle>Toast</CardTitle>
@@ -59,68 +60,67 @@ export default function App() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              TODO:
-              {/* <div class="flex flex-wrap gap-2">
-              <Button
-                onclick={() =>
-                  toast({
-                    title: 'Default Toast',
-                    description: 'This is a default toast notification',
-                  })
-                }
-              >
-                Default Toast
-              </Button>
+              <div class="flex flex-wrap gap-2">
+                <Button
+                  onclick={() =>
+                    toast({
+                      title: 'Default Toast',
+                      description: 'This is a default toast notification',
+                    })
+                  }
+                >
+                  Default Toast
+                </Button>
 
-              <Button
-                variant="secondary"
-                onclick={() =>
-                  toast.success({
-                    title: 'Success!',
-                    description: 'Your action was completed successfully',
-                  })
-                }
-              >
-                Success Toast
-              </Button>
+                <Button
+                  variant="secondary"
+                  onclick={() =>
+                    toast.success({
+                      title: 'Success!',
+                      description: 'Your action was completed successfully',
+                    })
+                  }
+                >
+                  Success Toast
+                </Button>
 
-              <Button
-                variant="destructive"
-                onclick={() =>
-                  toast.error({
-                    title: 'Error!',
-                    description: 'Something went wrong with your request',
-                  })
-                }
-              >
-                Error Toast
-              </Button>
+                <Button
+                  variant="destructive"
+                  onclick={() =>
+                    toast.error({
+                      title: 'Error!',
+                      description: 'Something went wrong with your request',
+                    })
+                  }
+                >
+                  Error Toast
+                </Button>
 
-              <Button
-                variant="outline"
-                onclick={() =>
-                  toast.info({ title: 'Info', description: 'Here is some useful information' })
-                }
-              >
-                Info Toast
-              </Button>
+                <Button
+                  variant="outline"
+                  onclick={() =>
+                    toast.info({ title: 'Info', description: 'Here is some useful information' })
+                  }
+                >
+                  Info Toast
+                </Button>
 
-              <Button
-                variant="ghost"
-                onclick={() =>
-                  toast({
-                    title: 'With Action',
-                    description: 'This toast has an action button',
-                    action: {
-                      label: 'Undo',
-                      onClick: () => alert('Action clicked!'),
-                    },
-                  })
-                }
-              >
-                Toast with Action
-              </Button>
-            </div> */}
+                <Button
+                  variant="ghost"
+                  onclick={() =>
+                    toast({
+                      title: 'With Action',
+                      description: 'This toast has an action button',
+                      action: {
+                        label: 'Undo',
+                        onClick: () => alert('Action clicked!'),
+                      },
+                    })
+                  }
+                >
+                  Toast with Action
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
