@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-// import { Toast, toast } from '@/components/ui/toast';
+import { Toast, toast } from '@/components/ui/toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Confirmer, confirm } from '@/components/ui/confirmer';
 import { ModeToggle } from '@/components/mode-toggle';
@@ -47,8 +47,8 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        {/* <Toast /> */}
-        {/* <Card>
+        <Toast />
+        <Card>
           <CardHeader>
             <CardTitle>Toast</CardTitle>
             <CardDescription>
@@ -58,7 +58,7 @@ export default function Home() {
           <CardContent>
             <div className="flex flex-wrap gap-2">
               <Button
-                onclick={() =>
+                onClick={() =>
                   toast({
                     title: 'Default Toast',
                     description: 'This is a default toast notification',
@@ -70,7 +70,7 @@ export default function Home() {
 
               <Button
                 variant="secondary"
-                onclick={() =>
+                onClick={() =>
                   toast.success({
                     title: 'Success!',
                     description: 'Your action was completed successfully',
@@ -82,7 +82,7 @@ export default function Home() {
 
               <Button
                 variant="destructive"
-                onclick={() =>
+                onClick={() =>
                   toast.error({
                     title: 'Error!',
                     description: 'Something went wrong with your request',
@@ -94,7 +94,7 @@ export default function Home() {
 
               <Button
                 variant="outline"
-                onclick={() =>
+                onClick={() =>
                   toast.info({ title: 'Info', description: 'Here is some useful information' })
                 }
               >
@@ -103,7 +103,7 @@ export default function Home() {
 
               <Button
                 variant="ghost"
-                onclick={() =>
+                onClick={() =>
                   toast({
                     title: 'With Action',
                     description: 'This toast has an action button',
@@ -118,7 +118,7 @@ export default function Home() {
               </Button>
             </div>
           </CardContent>
-        </Card> */}
+        </Card>
       </div>
     </main>
   );
