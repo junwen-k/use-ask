@@ -1,3 +1,5 @@
+'use client';
+
 import type { CallStore, SingletonCallStore } from '@ui-call/core';
 import { useCallback, useSyncExternalStore } from 'react';
 
