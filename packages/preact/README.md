@@ -81,7 +81,7 @@ function DeleteButton() {
 
 ### Using `@preact/signals` (optional)
 
-Swap to the signals variant for signal-based subscriptions. Only the imports and how you read `call` change:
+If you're already using `@preact/signals` in your project, you can switch to the signals variant by changing imports. The only difference is you read values via `.value`:
 
 ```tsx
 import { createSingletonCallStore, useSingletonCallStore } from '@ui-call/preact/signals';
