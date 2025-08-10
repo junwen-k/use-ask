@@ -2,7 +2,7 @@
 
 # @ui-call/svelte
 
-Idiomatic Svelte bindings for `@ui-call/core`, implemented as reactive subclasses with `createSubscriber` that integrate directly with Svelte's compiler reactivity.
+Idiomatic Svelte bindings for `@ui-call/core`, implemented as reactive subclasses using `createSubscriber`, integrating directly with Svelte's compiler reactivity.
 
 ## 📦 Installation
 
@@ -68,5 +68,5 @@ Imperatively trigger your custom UI from anywhere in your app:
   }
 </script>
 
-<button onclick={onDelete}>Delete</button>
+<button onclick={handleDelete}>Delete</button>
 ```
