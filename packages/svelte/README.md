@@ -18,6 +18,9 @@ This example demonstrates the most common use case: a confirmation dialog using 
 
 Build your own callable confirmation dialog using the singleton call store:
 
+> [!NOTE]
+> Define your store in `<script module>` so that you can export your `confirm()` function.
+
 ```svelte
 <script lang="ts" module>
   import { SingletonCallStore } from '@ui-call/svelte';
