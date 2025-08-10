@@ -18,9 +18,6 @@ This example demonstrates the most common use case: a confirmation dialog using 
 
 Build your own callable confirmation dialog using the singleton call store:
 
-> [!NOTE]
-> `useSingletonCallStore` must be used within `<script setup>`.
-
 ```vue
 <script setup lang="ts">
 import { useSingletonCallStore } from '@ui-call/vue';
@@ -45,6 +42,9 @@ export const confirm = store.call.bind(store);
   </dialog>
 </template>
 ```
+
+> [!NOTE]
+> `useSingletonCallStore` must be used within `<script setup>`.
 
 ### Add `<Confirmer />` to Your App
 
