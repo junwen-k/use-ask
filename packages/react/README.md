@@ -2,7 +2,7 @@
 
 # @ui-call/react
 
-Idiomatic React bindings for `@ui-call/core`, built on top of `useSyncExternalStore` for stable, performant reactivity in React 18+.
+Idiomatic React bindings for `@ui-call/core`, built on `useSyncExternalStore` for stable, performant reactivity in React 18+.
 
 ## 📦 Installation
 
@@ -32,7 +32,7 @@ function Confirmer() {
   const call = useSingletonCallStore(store);
 
   return (
-    // Using native <dialog> for brevity - customize the UI as needed
+    // Using native <dialog> for brevity—customize the UI as needed
     <dialog open={call.pending} onCancel={() => call.resolve(false)}>
       <p>{call.payload}</p>
       <button onClick={() => call.resolve(false)}>Cancel</button>
@@ -44,7 +44,7 @@ function Confirmer() {
 
 ### Add `<Confirmer />` to Your App
 
-Place it anywhere in your component tree, even in server components like `layout.tsx`:
+Place it anywhere in your component tree, including server components like `layout.tsx`:
 
 ```tsx
 import { Confirmer, confirm } from '@/components/confirmer';

@@ -40,7 +40,7 @@ if (confirmed) {
 - 🎯 **Universal Compatibility** - Seamlessly integrates with any JavaScript UI library through a simple observable pattern
 - 📡 **Imperative API** - Present any UI component and await user responses with natural async/await syntax
 - 📚 **Stackable Interactions** - Handle multiple concurrent UI calls
-- 🛠️ **Type Safe** - First-class TypeScript support
+- 🛠️ **Type-Safe** - First-class TypeScript support
 - 🌐 **Idiomatic API** - Thoughtfully designed to follow familiar browser patterns and conventions
 
 ## 📦 Installation
@@ -147,7 +147,7 @@ const store = new CallStore<{ message: string }, string, string>({
 });
 ```
 
-The `call.pending` boolean may be used to apply your animation CSS class.
+Use the `call.pending` boolean to apply your enter/exit animation classes.
 
 ## Acknowledgments
 
