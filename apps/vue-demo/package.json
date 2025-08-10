@@ -11,9 +11,18 @@
   },
   "dependencies": {
     "@nuxt/eslint": "1.8.0",
+    "@tailwindcss/vite": "^4.1.11",
     "@ui-call/vue": "workspace:*",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "eslint": "^9.32.0",
+    "lucide-vue-next": "^0.539.0",
     "nuxt": "^4.0.1",
+    "reka-ui": "^2.4.1",
+    "shadcn-nuxt": "2.2.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.11",
+    "tw-animate-css": "^1.3.6",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1"
   },
