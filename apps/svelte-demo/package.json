@@ -13,7 +13,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@ui-call/svelte": "workspace:*"
+    "@ui-call/svelte": "workspace:*",
+    "mode-watcher": "^1.1.0"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.5",

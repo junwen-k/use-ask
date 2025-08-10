@@ -1,12 +1,9 @@
-<!-- <script setup lang="ts">
-import { confirm } from './components/confirmer.vue';
-</script> -->
+<script setup lang="ts">
+import { Button } from '@/components/ui/button';
+import { Confirmer, confirm } from '@/components/ui/confirmer';
+</script>
 
 <template>
-  <Button>Click me</Button>
-  <!-- <div>
-    <Confirmer />
-    <Button variant="danger"
-      @click="confirm({ title: 'Delete', message: 'Are you sure you want to delete this?' })">Delete</Button>
-  </div> -->
+  <Confirmer />
+  <Button @click="confirm({ title: 'Delete', message: 'Are you sure you want to delete this?' })">Click me</Button>
 </template>
