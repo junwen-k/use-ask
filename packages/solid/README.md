@@ -64,12 +64,12 @@ Imperatively trigger your custom UI from anywhere in your app:
 import { confirm } from '@/components/confirmer';
 
 function DeleteButton() {
-  const handleDelete = async () => {
+  async function handleDelete() {
     const confirmed = await confirm('Are you sure you want to delete this item?');
     if (confirmed) {
       deleteItem();
     }
-  };
+  }
 
   return <button onClick={handleDelete}>Delete</button>;
 }

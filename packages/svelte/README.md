@@ -60,12 +60,12 @@ Imperatively trigger your custom UI from anywhere in your app:
 <script lang="ts">
   import { confirm } from '@/components/ui/confirmer';
 
-  async function handleDelete() {
+  async function handleDelete() {
     const confirmed = await confirm('Are you sure you want to delete this item?');
     if (confirmed) {
       deleteItem();
     }
-  };
+  }
 </script>
 
 <button onclick={onDelete}>Delete</button>
