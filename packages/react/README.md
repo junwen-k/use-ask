@@ -21,19 +21,22 @@ Build your own callable confirmation dialog using the singleton call store:
 ```tsx
 'use client';
 
-import { useEffect, useRef } from 'react';
 import { createSingletonCallStore, useSingletonCallStore } from '@ui-call/react';
 
 const store = createSingletonCallStore<string, boolean>();
 
-export const confirm = store.call;
+export const confirm = store.call.bind(store);
 
-function Confirmer() {
+export function Confirmer() {
   const call = useSingletonCallStore(store);
+
+  if (!call?.pending) {
+    return null;
+  }
 
   return (
     // Using native <dialog> for brevity—customize the UI as needed
-    <dialog open={call.pending} onCancel={() => call.resolve(false)}>
+    <dialog open onCancel={() => call.resolve(false)}>
       <p>{call.payload}</p>
       <button onClick={() => call.resolve(false)}>Cancel</button>
       <button onClick={() => call.resolve(true)}>OK</button>

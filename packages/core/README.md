@@ -40,7 +40,7 @@ if (confirmed) {
 - 🎯 **Universal Compatibility** - Seamlessly integrates with any JavaScript UI library through a simple observable pattern
 - 📡 **Imperative API** - Present any UI component and await user responses with natural async/await syntax
 - 📚 **Stackable Interactions** - Handle multiple concurrent UI calls
-- 🛠️ **Type-Safe** - First-class TypeScript support
+- 🛠️ **Type-safe** - First-class TypeScript support
 - 🌐 **Idiomatic API** - Thoughtfully designed to follow familiar browser patterns and conventions
 
 ## 📦 Installation
