@@ -13,6 +13,6 @@ Open http://localhost:5173 in your browser.
 
 Or edit online:
 
-[![Edit on StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/junwen-k/ui-call/tree/main/examples/svelte-demo)
+[![Edit on StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/junwen-k/ui-call/tree/main/examples/svelte-kit-demo)
 
-[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/sandbox/github/junwen-k/ui-call/tree/main/examples/svelte-demo)
+[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/sandbox/github/junwen-k/ui-call/tree/main/examples/svelte-kit-demo)
