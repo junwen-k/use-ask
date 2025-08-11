@@ -1,75 +1,18 @@
-# Nuxt Minimal Starter
+## @ui-call – Nuxt shadcn-vue example in TypeScript
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+This [Nuxt](https://nuxt.com/) project is bootstrapped using [`create nuxt`](https://nuxt.com/docs/4.x/api/commands/init) and uses [shadcn-vue](https://www.shadcn-vue.com/) to demonstrate `@ui-call/vue` for building imperative confirm dialogs and toast components with Vue 3 [SFC](https://vuejs.org/guide/scaling-up/sfc.html) format.
 
-## Setup
-
-Make sure to install dependencies:
+### Getting started
 
 ```bash
-# npm
-npm install
-
-# pnpm
 pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
 pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+Open http://localhost:3000 in your browser.
 
-Build the application for production:
+Or edit online:
 
-```bash
-# npm
-npm run build
+[![Edit on StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/junwen-k/ui-call/tree/main/examples/vue-demo)
 
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/sandbox/github/junwen-k/ui-call/tree/main/examples/vue-demo)
