@@ -35,7 +35,7 @@ export function Confirmer() {
   }
 
   return (
-    // Using native <dialog> for brevity—customize the UI as needed
+    // Using a basic <dialog> for brevity—customize the UI as needed
     <dialog open onCancel={() => call.resolve(false)}>
       <p>{call.payload}</p>
       <button onClick={() => call.resolve(false)}>Cancel</button>
@@ -50,7 +50,7 @@ export function Confirmer() {
 Place it anywhere in your component tree, including server components like `layout.tsx`:
 
 ```tsx
-import { Confirmer, confirm } from '@/components/confirmer';
+import { Confirmer } from '@/components/confirmer';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

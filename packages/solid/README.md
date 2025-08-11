@@ -44,7 +44,7 @@ export function Confirmer() {
 Place it anywhere in your component tree:
 
 ```tsx
-import { Confirmer, confirm } from '@/components/confirmer';
+import { Confirmer } from '@/components/confirmer';
 
 export default function App() {
   return (

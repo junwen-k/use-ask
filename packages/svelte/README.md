@@ -46,7 +46,7 @@ Place it anywhere in your component tree:
 
 ```svelte
 <script lang="ts">
-  import Confirmer from '@/components/Confirmer.svelte';
+  import Confirmer from '@/components/confirmer.svelte';
 </script>
 
 <Confirmer />
@@ -58,7 +58,7 @@ Imperatively trigger your custom UI from anywhere in your app:
 
 ```svelte
 <script lang="ts">
-  import { confirm } from '@/components/ui/confirmer';
+  import { confirm } from '@/components/confirmer';
 
   async function handleDelete() {
     const confirmed = await confirm('Are you sure you want to delete this item?');
