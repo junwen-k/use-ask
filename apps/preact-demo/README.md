@@ -1,15 +1,18 @@
-# `create-preact`
+## @ui-call – Preact Vite example in TypeScript
 
-<h2 align="center">
-  <img height="256" width="256" src="./src/assets/preact.svg">
-</h2>
+This [Vite](https://vitejs.dev/) project is bootstrapped with [`pnpm create preact`](https://github.com/preactjs/create-preact) and demonstrates `@ui-call/preact` for building imperative confirm dialogs with Preact 10+, using both the hooks API and the optional `@preact/signals` variant.
 
-<h3 align="center">Get started using Preact and Vite!</h3>
+### Getting started
 
-## Getting Started
+```bash
+pnpm install
+pnpm dev
+```
 
--   `pnpm dev` - Starts a dev server at http://localhost:5173/
+Open http://localhost:5173 in your browser.
 
--   `pnpm build` - Builds for production, emitting to `dist/`. Prerenders all found routes in app to static HTML
+Or edit online:
 
--   `pnpm preview` - Starts a server at http://localhost:4173/ to test production build locally
+[![Edit on StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/junwen-k/ui-call/tree/main/examples/preact-demo)
+
+[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/sandbox/github/junwen-k/ui-call/tree/main/examples/preact-demo)

@@ -1,6 +1,6 @@
-## @ui-call - Next.js shadcn/ui example in Typescript
+## @ui-call - Next.js shadcn/ui example in TypeScript
 
-This [Next.js](https://nextjs.org/) TypeScript app uses [shadcn/ui](https://ui.shadcn.com/) and demonstrates `@ui-call/react` for building imperative confirm dialogs and a Sonner-like toast component in React 18 and later.
+This [Next.js](https://nextjs.org/) project is bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/HEAD/packages/create-next-app) and uses [shadcn/ui](https://ui.shadcn.com/) to demonstrate `@ui-call/react` for building imperative confirm dialogs and toast components in React 18+.
 
 ### Getting started
 
