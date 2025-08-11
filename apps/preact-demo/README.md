@@ -1,6 +1,6 @@
 ## @ui-call – Preact Vite example in TypeScript
 
-This [Vite](https://vitejs.dev/) project is bootstrapped with [`pnpm create preact`](https://github.com/preactjs/create-preact) and demonstrates `@ui-call/preact` for building imperative confirm dialogs with Preact 10+, using both the hooks API and the optional `@preact/signals` variant.
+This [Vite](https://vitejs.dev/) project is bootstrapped with [`create-preact`](https://github.com/preactjs/create-preact) and demonstrates `@ui-call/preact` for building imperative confirm dialogs with Preact 10+, using both the hooks API and the optional `@preact/signals` variant.
 
 ### Getting started
 

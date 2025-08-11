@@ -1,32 +1,18 @@
-# SolidStart
+## @ui-call – SolidStart shadcn/ui example in TypeScript
 
-Everything you need to build a Solid project, powered by [`solid-start`](https://start.solidjs.com);
+This [SolidStart](https://start.solidjs.com/) project is bootstrapped with [`create-solid`](https://github.com/solidjs-community/solid-cli/tree/main/packages/create-solid) and uses [shadcn-solid](https://shadcn-solid.com/) to demonstrate `@ui-call/solid` for building imperative confirm dialogs and toast components with Solid 1.x.
 
-## Creating a project
-
-```bash
-# create a new project in the current directory
-npm init solid@latest
-
-# create a new project in my-app
-npm init solid@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Getting started
 
 ```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+pnpm install
+pnpm dev
 ```
 
-## Building
+Open http://localhost:3000 in your browser.
 
-Solid apps are built with _presets_, which optimise your project for deployment to different environments.
+Or edit online:
 
-By default, `npm run build` will generate a Node app that you can run with `npm start`. To use a different preset, add it to the `devDependencies` in `package.json` and specify in your `app.config.js`.
+[![Edit on StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/junwen-k/ui-call/tree/main/examples/solid-demo)
 
-## This project was created with the [Solid CLI](https://github.com/solidjs-community/solid-cli)
+[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/sandbox/github/junwen-k/ui-call/tree/main/examples/solid-demo)
