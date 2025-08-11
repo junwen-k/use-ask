@@ -1,5 +1,5 @@
 {
-  "name": "@ui-call/preact-demo",
+  "name": "@ui-call/preact-vite-demo",
   "private": true,
   "type": "module",
   "scripts": {

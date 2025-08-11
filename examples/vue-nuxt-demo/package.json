@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-app",
+  "name": "@ui-call/vue-nuxt-demo",
   "type": "module",
   "private": true,
   "scripts": {

@@ -1,5 +1,5 @@
 {
-  "name": "svelte-demo",
+  "name": "@ui-call/svelte-kit-demo",
   "private": true,
   "version": "0.0.1",
   "type": "module",

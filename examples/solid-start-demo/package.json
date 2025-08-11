@@ -1,5 +1,5 @@
 {
-  "name": "example-bare",
+  "name": "@ui-call/solid-start-demo",
   "type": "module",
   "scripts": {
     "dev": "vinxi dev",
